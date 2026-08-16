@@ -39,23 +39,23 @@ INSTALLED_APPS = [
 
 ## 🤖 How to Load the AI Skill (AI Assistants Setup)
 
-To make AI assistants (such as Gemini CLI, Claude, Cursor, and Windsurf) strictly follow the `django-guardian` architectural guidelines, you should load the pre-packaged `SKILL.md` file into their context before coding:
+To make AI assistants (such as Gemini CLI, Claude, Cursor, and Windsurf) strictly follow the `django-guardian` architectural guidelines, you should load the root-level `SKILL.md` file into their context before coding:
 
-### 1. For Gemini CLI (Automatic Bootstrapping)
-Create a `GEMINI.md` file in the root of your project instructing the agent to load the skill dynamically on its first turn:
-```markdown
-# 🛡️ SYSTEM BOOTSTRAP
-- **Mandatory Action (First Turn):** You MUST run `read_file` to read the entire expert skill file at `django_guardian/skills/SKILL.md` before writing any code.
+### 1. For Gemini CLI (Global or Workspace Skill)
+Install the expert skill directly from this repository using the native CLI command:
+```bash
+# Install globally for all your projects
+bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-guardian.git --consent
+
+# Or install locally for the current project workspace only
+bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-guardian.git --scope workspace --consent
 ```
-Alternatively, if the skill is installed globally in your environment, you can instruct your agent at the start of the session:
-> *"Hey! Please activate the skill 'django-guardian' to guide our project development."*
 
 ### 2. For Cursor & Windsurf (`.cursorrules` / `.windsurfrules`)
-To enforce these rules inside Cursor or Windsurf, copy or symlink the `SKILL.md` file to the root of your project:
+To enforce these rules inside Cursor or Windsurf, download or copy the root-level `SKILL.md` file to `.cursorrules` in your project root:
 ```bash
-cp django_guardian/skills/SKILL.md .cursorrules
+curl -fsSL https://raw.githubusercontent.com/maiquelleonel/django-guardian/main/SKILL.md -o .cursorrules
 ```
-Or create a custom rule file under `.cursor/rules/django-guardian.md`.
 
 ### 3. For Claude Desktop / Custom MCP Clients
 Configure your Claude Desktop configuration file (`config.json`) to run the MCP server with the settings pointed to your project, so that Claude has full, real-time framework introspection as described in the skill file.

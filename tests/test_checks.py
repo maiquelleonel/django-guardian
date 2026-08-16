@@ -202,37 +202,3 @@ class TestGuardianAuditCommand(TestCase):
         self.assertIn("Auditing Middlewares", output)
         self.assertIn("Auditing Views", output)
         self.assertIn("ARCHITECTURAL AUDIT SUMMARY", output)
-
-
-class TestGuardianInstallSkillCommand(TestCase):
-    @patch("shutil.copy2")
-    @patch("os.makedirs")
-    def test_guardian_install_skill_command_runs_successfully(self, mock_makedirs, mock_copy):
-        from io import StringIO
-
-        from django.core.management import call_command
-
-        out = StringIO()
-        call_command("guardian_install_skill", stdout=out)
-        output = out.getvalue()
-
-        self.assertIn("Sincronizando a Skill global do django-guardian", output)
-        self.assertIn("Expert AI Skill successfully installed to", output)
-        mock_makedirs.assert_called()
-        mock_copy.assert_called()
-
-
-class TestAppConfigSkillBootstrap(TestCase):
-    @patch("shutil.copy2")
-    @patch("os.makedirs")
-    @patch("os.path.exists")
-    def test_app_config_bootstraps_skill_on_ready(self, mock_exists, mock_makedirs, mock_copy):
-        from django.apps import apps as django_apps
-
-        app_config = django_apps.get_app_config("django_guardian")
-
-        mock_exists.return_value = True
-        app_config.ready()
-
-        mock_makedirs.assert_called()
-        mock_copy.assert_called()

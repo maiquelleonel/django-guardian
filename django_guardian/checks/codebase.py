@@ -28,21 +28,21 @@ def check_codebase_memory_installed(app_configs, **kwargs):
     if not codebase_memory_installed:
         checks_results.append(
             Warning(
-                "O pacote 'codebase-memory-mcp' não está instalado no sistema.",
+                "The package 'codebase-memory-mcp' is not installed on the system.",
                 hint=(
-                    "O 'codebase-memory-mcp' é um servidor MCP que indexa o seu código em "
-                    "um grafo de conhecimento local, permitindo que agentes de IA compreendam "
-                    "estruturas e relacionamentos entre classes sem desperdiçar tokens.\n\n"
-                    "Ganhos de ter o codebase-memory-mcp no sistema:\n"
-                    "  - 🗺️ Grafo de Conhecimento: Mapeia dependências, classes, rotas e tabelas.\n"
-                    "  - 🔎 Buscas Inteligentes: Permite buscas semânticas avançadas ultra-rápidas.\n"
-                    "  - 📉 Eficiência de Contexto: Reduz o consumo de tokens e evita leituras redundantes.\n\n"
-                    "Como instalar:\n"
-                    "  Execute (Linux/macOS): curl -fsSL "
+                    "The 'codebase-memory-mcp' is an MCP server that indexes your codebase into "
+                    "a local knowledge graph, allowing AI agents to understand structures "
+                    "and relationships between classes without wasting tokens.\n\n"
+                    "Benefits of having codebase-memory-mcp in the system:\n"
+                    "  - 🗺️ Knowledge Graph: Maps dependencies, classes, routes, and tables.\n"
+                    "  - 🔎 Intelligent Search: Enables advanced, ultra-fast semantic searches.\n"
+                    "  - 📉 Context Efficiency: Reduces token consumption and avoids redundant reads.\n\n"
+                    "How to install:\n"
+                    "  Run (Linux/macOS): curl -fsSL "
                     "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash\n"
-                    "  Ou via pip: pip install codebase-memory-mcp\n"
-                    "  Ou via npm: npm install -g codebase-memory-mcp\n\n"
-                    "Visualize o grafo de conhecimento e explore sua estrutura usando a interface web:\n"
+                    "  Or via pip: pip install codebase-memory-mcp\n"
+                    "  Or via npm: npm install -g codebase-memory-mcp\n\n"
+                    "Visualize the knowledge graph and explore its structure using the web interface:\n"
                     "  Interface UI: https://github.com/DeusData/codebase-memory-mcp-ui"
                 ),
                 id="guardian.W004",
@@ -51,13 +51,13 @@ def check_codebase_memory_installed(app_configs, **kwargs):
     else:
         checks_results.append(
             Info(
-                "O pacote 'codebase-memory-mcp' está instalado e pronto para uso!",
+                "The package 'codebase-memory-mcp' is installed and ready for use!",
                 hint=(
-                    "Para indexar este repositório no grafo de conhecimento local do MCP, execute:\n"
+                    "To index this repository into the MCP local knowledge graph, run:\n"
                     "  codebase-memory-mcp index .\n\n"
-                    "Visualize o grafo de conhecimento e explore sua estrutura usando a interface web:\n"
+                    "Visualize the knowledge graph and explore its structure using the web interface:\n"
                     "  Interface UI: https://github.com/DeusData/codebase-memory-mcp-ui\n\n"
-                    "Isso fornecerá buscas semânticas por grafos altamente precisas ao seu assistente de IA."
+                    "This will provide highly precise graph-based semantic searches to your AI assistant."
                 ),
                 id="guardian.I002",
             )

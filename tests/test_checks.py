@@ -86,8 +86,8 @@ class TestAIBoostChecks(TestCase):
         errors = run_checks()
         warnings = [e for e in errors if e.id == "guardian.W003"]
         self.assertEqual(len(warnings), 1)
-        self.assertIn("O pacote 'django-ai-boost' não está instalado", warnings[0].msg)
-        self.assertIn("Como instalar", warnings[0].hint)
+        self.assertIn("The package 'django-ai-boost' is not installed", warnings[0].msg)
+        self.assertIn("How to install", warnings[0].hint)
 
     @patch("importlib.metadata.distribution")
     def test_check_passes_when_installed(self, mock_distribution):
@@ -96,7 +96,7 @@ class TestAIBoostChecks(TestCase):
         errors = run_checks()
         infos = [e for e in errors if e.id == "guardian.I001"]
         self.assertEqual(len(infos), 1)
-        self.assertIn("O pacote 'django-ai-boost' está instalado", infos[0].msg)
+        self.assertIn("The package 'django-ai-boost' is installed", infos[0].msg)
         self.assertIn("django-ai-boost --settings", infos[0].hint)
 
 
@@ -112,8 +112,8 @@ class TestCodebaseMemoryChecks(TestCase):
         errors = run_checks()
         warnings = [e for e in errors if e.id == "guardian.W004"]
         self.assertEqual(len(warnings), 1)
-        self.assertIn("O pacote 'codebase-memory-mcp' não está instalado", warnings[0].msg)
-        self.assertIn("Como instalar", warnings[0].hint)
+        self.assertIn("The package 'codebase-memory-mcp' is not installed", warnings[0].msg)
+        self.assertIn("How to install", warnings[0].hint)
 
     @patch("shutil.which")
     def test_check_passes_when_installed_via_path(self, mock_which):
@@ -122,7 +122,7 @@ class TestCodebaseMemoryChecks(TestCase):
         errors = run_checks()
         infos = [e for e in errors if e.id == "guardian.I002"]
         self.assertEqual(len(infos), 1)
-        self.assertIn("O pacote 'codebase-memory-mcp' está instalado", infos[0].msg)
+        self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
         self.assertIn("codebase-memory-mcp index", infos[0].hint)
 
     @patch("shutil.which")
@@ -134,7 +134,7 @@ class TestCodebaseMemoryChecks(TestCase):
         errors = run_checks()
         infos = [e for e in errors if e.id == "guardian.I002"]
         self.assertEqual(len(infos), 1)
-        self.assertIn("O pacote 'codebase-memory-mcp' está instalado", infos[0].msg)
+        self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
         self.assertIn("codebase-memory-mcp index", infos[0].hint)
 
 
@@ -153,7 +153,7 @@ class TestBestPracticesChecks(TestCase):
         errors = run_checks()
         warnings = [e for e in errors if e.id == "guardian.W005"]
         self.assertEqual(len(warnings), 1)
-        self.assertIn("Uso de naive datetime detectado", warnings[0].msg)
+        self.assertIn("Usage of naive datetime detected", warnings[0].msg)
         self.assertIn("views.py", warnings[0].msg)
         self.assertIn("timezone.now", warnings[0].hint)
 
@@ -172,7 +172,7 @@ class TestBestPracticesChecks(TestCase):
         errors = run_checks()
         warnings = [e for e in errors if e.id == "guardian.W006"]
         self.assertEqual(len(warnings), 1)
-        self.assertIn("Chamada HTTP do 'requests' sem timeout", warnings[0].msg)
+        self.assertIn("HTTP call to 'requests' without timeout", warnings[0].msg)
         self.assertIn("services.py", warnings[0].msg)
         self.assertIn("timeout", warnings[0].hint)
 
@@ -184,3 +184,39 @@ class TestGodModelChecks(TestCase):
         self.assertTrue(len(warnings) >= 1)
         self.assertIn("GodModel", warnings[0].msg)
         self.assertIn("services.py", warnings[0].hint)
+
+
+class TestGuardianAuditCommand(TestCase):
+    def test_guardian_audit_command_runs_successfully(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("guardian_audit", stdout=out)
+        output = out.getvalue()
+
+        self.assertIn("DJANGO GUARDIAN ARCHITECTURAL AUDIT", output)
+        self.assertIn("Running System Integrity Checks", output)
+        self.assertIn("Auditing Production Readiness", output)
+        self.assertIn("Auditing Middlewares", output)
+        self.assertIn("Auditing Views", output)
+        self.assertIn("ARCHITECTURAL AUDIT SUMMARY", output)
+
+
+class TestGuardianInstallSkillCommand(TestCase):
+    @patch("shutil.copy2")
+    @patch("os.makedirs")
+    def test_guardian_install_skill_command_runs_successfully(self, mock_makedirs, mock_copy):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("guardian_install_skill", stdout=out)
+        output = out.getvalue()
+
+        self.assertIn("Sincronizando a Skill global do django-guardian", output)
+        self.assertIn("Expert AI Skill successfully installed to", output)
+        mock_makedirs.assert_called()
+        mock_copy.assert_called()

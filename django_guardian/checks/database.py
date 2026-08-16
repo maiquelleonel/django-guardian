@@ -89,14 +89,14 @@ def check_model_god_objects(app_configs, **kwargs):
             warnings.append(
                 Warning(
                     (
-                        f"O modelo '{model.__name__}' pode estar se tornando um 'God Object' "
-                        f"({len(custom_methods)} métodos customizados)."
+                        f"The model '{model.__name__}' may be turning into a 'God Object' "
+                        f"({len(custom_methods)} custom methods)."
                     ),
                     hint=(
-                        "Considere mover lógicas de workflows complexos e integrações com serviços "
-                        "externos (como pagamentos, e-mails, APIs) para uma camada de Serviços "
-                        "dedicada ('services.py'). Isso mantém seus modelos limpos (Lean Models) "
-                        "e torna a aplicação agnóstica à camada de entrega (Views, DRF ou Django Ninja)."
+                        "Consider moving complex workflows and external integration logic "
+                        "(such as payments, emails, APIs) to a dedicated service layer ('services.py') "
+                        "or orchestrator layer ('orchestrators/'). This keeps your models clean (Lean Models) "
+                        "and makes the application delivery-agnostic (Views, DRF, or Django Ninja)."
                     ),
                     id="guardian.W007",
                     obj=model,

@@ -28,11 +28,11 @@ def _scan_file_for_issues(file_path, app_name, file_name):
                 func_used = match_dt.group(1)
                 warnings.append(
                     Warning(
-                        (f"Uso de naive datetime detectado em '{app_name}/{file_name}' na linha {line_num}."),
+                        (f"Usage of naive datetime detected in '{app_name}/{file_name}' on line {line_num}."),
                         hint=(
-                            f"Substitua 'datetime.{func_used}()' por "
-                            "'django.utils.timezone.now()' para garantir suporte "
-                            "correto a fuso horário e conformidade em produção."
+                            f"Replace 'datetime.{func_used}()' with "
+                            "'django.utils.timezone.now()' to ensure proper "
+                            "timezone support and production compliance."
                         ),
                         id="guardian.W005",
                     )
@@ -46,11 +46,11 @@ def _scan_file_for_issues(file_path, app_name, file_name):
                 http_method = match_req.group(1)
                 warnings.append(
                     Warning(
-                        (f"Chamada HTTP do 'requests' sem timeout em '{app_name}/{file_name}' na linha {line_num}."),
+                        (f"HTTP call to 'requests' without timeout in '{app_name}/{file_name}' on line {line_num}."),
                         hint=(
-                            f"Adicione o parâmetro 'timeout' (ex: "
-                            f"requests.{http_method}(url, timeout=5)) para evitar "
-                            "que threads fiquem presas por tempo indeterminado."
+                            f"Add the 'timeout' parameter (e.g., "
+                            f"requests.{http_method}(url, timeout=5)) to prevent "
+                            "sync threads from hanging indefinitely."
                         ),
                         id="guardian.W006",
                     )

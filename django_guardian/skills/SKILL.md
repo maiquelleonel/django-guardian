@@ -1,3 +1,8 @@
+---
+name: django-guardian
+description: Architectural linter, quality auditor, and idiom expert for Django & DRF. Use when creating, modifying, or auditing Models, Views, Serializers, Signals, and ORM Queries to enforce "The Django Way", prevent performance traps, and utilize the django-ai-boost MCP server.
+---
+
 # 🛡️ Django Guardian & Expert Skill
 
 ## Overview
@@ -48,9 +53,11 @@ You must act as a collaborative, highly-skilled peer-programming Staff Engineer:
   - *Guardian Action:* Always scope the query using user or tenant context (e.g., in CBVs or ViewSets, override `get_queryset()` to filter by owner: `self.queryset.filter(user=self.request.user)`).
 
 ### 5. 🗺️ Thin Views & Lean Models (Anti-God Object Rule)
-- **Thin Views / Thin Admins:** Keep `views.py` and `admin.py` strictly thin, focused solely on data exposure and presentation. Multi-step workflows belong in "Service Functions" or Domain Services.
+- **Thin Views / Thin Admins:** Keep `views.py` and `admin.py` strictly thin, focused solely on data exposure and presentation.
 - **Lean Models:** Centralize only data-centric rules, property helpers, and internal validation in the Model layer. Avoid external integrations (payments, emails, third-party APIs) or multi-model orchestrations inside Model methods to prevent God Objects.
-- **Services Boundary:** Keep the `services/` layer restricted to orchestrating business workflows and interacting with external systems, making the application agnostically accessible by standard Views, DRF, or Django Ninja.
+- **Services vs. Orchestrators Boundary (SOLID):**
+  - **`services/` (External Integrations):** Dedicated strictly to wrapping third-party integration protocols and API clients (e.g., WhatsApp API wrappers, Stripe gateway clients, CRM sync). They should not contain core Django business orchestration logic.
+  - **`orchestrators/` (or `use_cases/` / `flows/`):** Dedicated to local business orchestration, multi-step workflows, and state machines (e.g., orchestrating a multi-phase interview process via WhatsApp, coordinating transitions across different models and phases). This is where the core business flow lives.
 
 ### 6. 🕒 Datetimes & Time Zones (Production Standard)
 - **No Naive Datetimes:** Avoid using naive python datetimes (`datetime.now()`, `datetime.utcnow()`).
@@ -85,6 +92,16 @@ If these packages are already available or requested by the user, configure and 
   - *Guardian Action:* Check the return count of updates/deletes. If an update expected to modify exactly 1 row fails (`updated != 1`), raise a domain exception or log a warning.
 - **Synchronous Signals Danger:** Signals are synchronous. If they fail, they will roll back the current database transaction.
   - *Guardian Action:* Prefer explicit service calls over signals for side effects, or ensure signal receivers are heavily guarded and catch/log all exceptions internally.
+
+### 11. 🧩 SOLID, Clean Code, & Anti-Overengineering (The Django Way)
+When applying theoretical principles like SOLID, DRY, YAGNI, or Clean Code, translate them into concrete Django-native patterns rather than introducing overengineered layers:
+- **No Manual Repositories (YAGNI / DRY):** Do not write manual Repository or Unit of Work classes over Django's ORM. Django's Active Record pattern already abstracts database persistence.
+  - *Guardian Action:* Move reusable query filters into custom Model `QuerySet` or `Manager` subclasses instead of building abstract repository classes.
+- **No Manual DTOs (YAGNI / SOLID):** Do not build custom data transfer object (DTO) classes for input payloads.
+  - *Guardian Action:* Use Django `Forms` or DRF `Serializers` (or Pydantic schemas in Django Ninja) for input validation, sanitization, and data mapping.
+- **Single Responsibility (SOLID - S) via Services:** Avoid turning models into God Objects that handle external integrations (emails, payments, webhooks).
+  - *Guardian Action:* Use standalone **Service Functions** (Domain Services) in `services.py` to orchestrate multi-step business actions and side effects, leaving the Model lean and focused on data rules.
+- **Don't Fight the Framework (Clean Code):** Leverage Django's built-in batteries (e.g., CBVs, built-in validation, Django System Checks, and authentication backends) instead of writing custom, proprietary layers from scratch.
 
 ---
 

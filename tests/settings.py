@@ -22,3 +22,13 @@ DATABASES = {
 }
 
 USE_TZ = True
+
+# Silence system checks during test execution to keep output extremely clean and token-efficient
+SILENCED_SYSTEM_CHECKS = [
+    "guardian.W001",
+    "guardian.W003",
+    "guardian.W004",
+    "guardian.W007",
+    "guardian.I001",
+    "guardian.I002",
+]

@@ -4,7 +4,7 @@ default:
 
 # Run tests
 test:
-    uv run tests/manage.py test tests
+    uv run tests/manage.py test tests -v 0
 
 # Run code styling check
 lint:

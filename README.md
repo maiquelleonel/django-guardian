@@ -54,7 +54,7 @@ bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-guard
 ### 2. For Cursor & Windsurf (`.cursorrules` / `.windsurfrules`)
 To enforce these rules inside Cursor or Windsurf, download or copy the root-level `SKILL.md` file to `.cursorrules` in your project root:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/maiquelleonel/django-guardian/main/SKILL.md -o .cursorrules
+curl -fsSL https://raw.githubusercontent.com/maiquelleonel/django-guardian/master/SKILL.md -o .cursorrules
 ```
 
 ### 3. For Claude Desktop / Custom MCP Clients

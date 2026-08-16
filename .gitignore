@@ -218,3 +218,6 @@ tmp/
 *.ipynb
 .codebase-memory
 ats/prompts/*.out
+
+# Gemini CLI local configuration
+.gemini/

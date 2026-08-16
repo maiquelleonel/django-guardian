@@ -107,7 +107,33 @@ When applying theoretical principles like SOLID, DRY, YAGNI, or Clean Code, tran
 
 ## ⚡ 2. Integration with `django-ai-boost` & `codebase-memory-mcp` Servers
 
-You are OBLIGATED to verify that the tools from both `django-ai-boost` and `codebase-memory-mcp` are loaded and active in your session.
+You are OBLIGATED to verify that the tools from both `django-ai-boost` and `codebase-memory-mcp` are loaded and active in your active session.
+
+If you detect that `django-ai-boost` or `codebase-memory-mcp` tools are missing from your active tool declarations, proactively guide the developer to configure them:
+1. **Explain the benefits** and suggest installing them via their terminal (e.g., running `uv add --dev django-ai-boost`).
+2. **Propose creating or updating their local `.gemini/settings.json` file** in their project root. Show them the exact JSON configuration, dynamically substituting `DJANGO_SETTINGS_MODULE` with their project's settings module (e.g., dynamically detected as `gpurent.settings` or `tests.settings` from the environment).
+   *Example configuration:*
+   ```json
+   {
+     "mcpServers": {
+       "django-ai-boost": {
+         "command": "uv",
+         "args": ["run", "django-ai-boost"],
+         "env": {
+           "DJANGO_SETTINGS_MODULE": "<detected_settings_module>"
+         }
+       },
+       "codebase-memory-mcp": {
+         "command": "codebase-memory-mcp",
+         "args": [],
+         "env": {
+           "NODE_ENV": "production"
+         }
+       }
+     }
+   }
+   ```
+3. **Ask for explicit consent** before writing or updating `.gemini/settings.json` for them.
 
 When operating in an environment equipped with these MCP servers, you must use them to **empirically validate** assumptions rather than guessing:
 

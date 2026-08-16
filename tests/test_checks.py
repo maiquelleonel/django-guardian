@@ -220,3 +220,19 @@ class TestGuardianInstallSkillCommand(TestCase):
         self.assertIn("Expert AI Skill successfully installed to", output)
         mock_makedirs.assert_called()
         mock_copy.assert_called()
+
+
+class TestAppConfigSkillBootstrap(TestCase):
+    @patch("shutil.copy2")
+    @patch("os.makedirs")
+    @patch("os.path.exists")
+    def test_app_config_bootstraps_skill_on_ready(self, mock_exists, mock_makedirs, mock_copy):
+        from django.apps import apps as django_apps
+
+        app_config = django_apps.get_app_config("django_guardian")
+
+        mock_exists.return_value = True
+        app_config.ready()
+
+        mock_makedirs.assert_called()
+        mock_copy.assert_called()

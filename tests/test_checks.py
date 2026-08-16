@@ -1,0 +1,186 @@
+from unittest.mock import patch
+
+from django.core.checks import run_checks
+from django.db import models
+from django.db.models.signals import post_save
+from django.test import TestCase
+
+from django_guardian.decorators import prevent_windmill_loops
+
+
+class UnindexedModel(models.Model):
+    # This field contains 'email', which should trigger guardian.W001
+    contact_email = models.CharField(max_length=255)
+
+    class Meta:
+        app_label = "django_guardian"  # Match our installed app
+
+
+class SafeIndexedModel(models.Model):
+    contact_email = models.CharField(max_length=255, db_index=True)
+
+    class Meta:
+        app_label = "django_guardian"
+
+
+class GodModel(models.Model):
+    class Meta:
+        app_label = "django_guardian"
+
+    def process_payment(self):
+        # Using requests terms to simulate external integration
+        return "requests.post('https://payment.example.com')"
+
+
+class TestDatabaseChecks(TestCase):
+    def test_unindexed_search_field_warning(self):
+        # Run system checks for database tag
+        errors = run_checks(tags=["database"])
+
+        # We expect a warning for UnindexedModel.contact_email
+        warnings = [e for e in errors if e.id == "guardian.W001"]
+        self.assertTrue(len(warnings) >= 1)
+        self.assertIn("contact_email", warnings[0].msg)
+        self.assertIn("UnindexedModel", warnings[0].msg)
+
+
+class TestSignalChecks(TestCase):
+    def test_windmill_loop_check_detects_unsafe_save(self):
+        # Create an unsafe receiver
+        def unsafe_receiver(sender, instance, **kwargs):
+            instance.save()  # Triggers check because .save() is present without guards
+
+        post_save.connect(unsafe_receiver, sender=SafeIndexedModel, dispatch_uid="unsafe_test_uid")
+        try:
+            errors = run_checks(tags=["models"])
+            warnings = [e for e in errors if e.id == "guardian.W002"]
+            self.assertTrue(len(warnings) >= 1)
+            self.assertIn("unsafe_receiver", warnings[0].msg)
+        finally:
+            post_save.disconnect(unsafe_receiver, sender=SafeIndexedModel, dispatch_uid="unsafe_test_uid")
+
+    def test_windmill_loop_check_passes_with_decorator(self):
+        # Create a safe receiver using our decorator
+        @prevent_windmill_loops()
+        def safe_receiver(sender, instance, **kwargs):
+            instance.save()
+
+        post_save.connect(safe_receiver, sender=SafeIndexedModel, dispatch_uid="safe_test_uid")
+        try:
+            errors = run_checks(tags=["models"])
+            warnings = [e for e in errors if e.id == "guardian.W002" and "safe_receiver" in e.msg]
+            self.assertEqual(len(warnings), 0)
+        finally:
+            post_save.disconnect(safe_receiver, sender=SafeIndexedModel, dispatch_uid="safe_test_uid")
+
+
+class TestAIBoostChecks(TestCase):
+    @patch("importlib.metadata.distribution")
+    @patch("importlib.util.find_spec")
+    def test_check_warns_when_not_installed(self, mock_find_spec, mock_distribution):
+        import importlib.metadata
+
+        mock_distribution.side_effect = importlib.metadata.PackageNotFoundError
+        mock_find_spec.return_value = None
+
+        errors = run_checks()
+        warnings = [e for e in errors if e.id == "guardian.W003"]
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("O pacote 'django-ai-boost' não está instalado", warnings[0].msg)
+        self.assertIn("Como instalar", warnings[0].hint)
+
+    @patch("importlib.metadata.distribution")
+    def test_check_passes_when_installed(self, mock_distribution):
+        mock_distribution.return_value = "fake_distribution"
+
+        errors = run_checks()
+        infos = [e for e in errors if e.id == "guardian.I001"]
+        self.assertEqual(len(infos), 1)
+        self.assertIn("O pacote 'django-ai-boost' está instalado", infos[0].msg)
+        self.assertIn("django-ai-boost --settings", infos[0].hint)
+
+
+class TestCodebaseMemoryChecks(TestCase):
+    @patch("shutil.which")
+    @patch("importlib.metadata.distribution")
+    def test_check_warns_when_not_installed(self, mock_distribution, mock_which):
+        import importlib.metadata
+
+        mock_which.return_value = None
+        mock_distribution.side_effect = importlib.metadata.PackageNotFoundError
+
+        errors = run_checks()
+        warnings = [e for e in errors if e.id == "guardian.W004"]
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("O pacote 'codebase-memory-mcp' não está instalado", warnings[0].msg)
+        self.assertIn("Como instalar", warnings[0].hint)
+
+    @patch("shutil.which")
+    def test_check_passes_when_installed_via_path(self, mock_which):
+        mock_which.return_value = "/usr/local/bin/codebase-memory-mcp"
+
+        errors = run_checks()
+        infos = [e for e in errors if e.id == "guardian.I002"]
+        self.assertEqual(len(infos), 1)
+        self.assertIn("O pacote 'codebase-memory-mcp' está instalado", infos[0].msg)
+        self.assertIn("codebase-memory-mcp index", infos[0].hint)
+
+    @patch("shutil.which")
+    @patch("importlib.metadata.distribution")
+    def test_check_passes_when_installed_via_pip(self, mock_distribution, mock_which):
+        mock_which.return_value = None
+        mock_distribution.return_value = "fake_distribution"
+
+        errors = run_checks()
+        infos = [e for e in errors if e.id == "guardian.I002"]
+        self.assertEqual(len(infos), 1)
+        self.assertIn("O pacote 'codebase-memory-mcp' está instalado", infos[0].msg)
+        self.assertIn("codebase-memory-mcp index", infos[0].hint)
+
+
+class TestBestPracticesChecks(TestCase):
+    @patch("django_guardian.checks.best_practices.os.walk")
+    @patch("django_guardian.checks.best_practices.open", create=True)
+    def test_check_detects_naive_datetime(self, mock_open, mock_walk):
+        # Setup mocks
+        mock_walk.return_value = [("/mock/path", [], ["views.py"])]
+        mock_open.return_value.__enter__.return_value.readlines.return_value = [
+            "import datetime\n",
+            "current_time = datetime.now()\n",
+            "# datetime.now() but in a comment\n",
+        ]
+
+        errors = run_checks()
+        warnings = [e for e in errors if e.id == "guardian.W005"]
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Uso de naive datetime detectado", warnings[0].msg)
+        self.assertIn("views.py", warnings[0].msg)
+        self.assertIn("timezone.now", warnings[0].hint)
+
+    @patch("django_guardian.checks.best_practices.os.walk")
+    @patch("django_guardian.checks.best_practices.open", create=True)
+    def test_check_detects_requests_without_timeout(self, mock_open, mock_walk):
+        # Setup mocks
+        mock_walk.return_value = [("/mock/path", [], ["services.py"])]
+        mock_open.return_value.__enter__.return_value.readlines.return_value = [
+            "import requests\n",
+            "response = requests.get('https://api.example.com')\n",
+            "response_with_timeout = requests.post('https://api.example.com', timeout=5)\n",
+            "# requests.get('https://api.example.com') but in a comment\n",
+        ]
+
+        errors = run_checks()
+        warnings = [e for e in errors if e.id == "guardian.W006"]
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Chamada HTTP do 'requests' sem timeout", warnings[0].msg)
+        self.assertIn("services.py", warnings[0].msg)
+        self.assertIn("timeout", warnings[0].hint)
+
+
+class TestGodModelChecks(TestCase):
+    def test_god_model_check_detects_unsafe_integration(self):
+        errors = run_checks(tags=["models"])
+        warnings = [e for e in errors if e.id == "guardian.W007"]
+        self.assertTrue(len(warnings) >= 1)
+        self.assertIn("GodModel", warnings[0].msg)
+        self.assertIn("services.py", warnings[0].hint)

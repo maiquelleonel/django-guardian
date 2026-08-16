@@ -123,7 +123,7 @@ class TestCodebaseMemoryChecks(TestCase):
         infos = [e for e in errors if e.id == "guardian.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp index", infos[0].hint)
+        self.assertIn("codebase-memory-mcp config", infos[0].hint)
 
     @patch("shutil.which")
     @patch("importlib.metadata.distribution")
@@ -135,7 +135,7 @@ class TestCodebaseMemoryChecks(TestCase):
         infos = [e for e in errors if e.id == "guardian.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp index", infos[0].hint)
+        self.assertIn("codebase-memory-mcp config", infos[0].hint)
 
 
 class TestBestPracticesChecks(TestCase):

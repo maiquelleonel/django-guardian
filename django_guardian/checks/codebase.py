@@ -28,22 +28,20 @@ def check_codebase_memory_installed(app_configs, **kwargs):
     if not codebase_memory_installed:
         checks_results.append(
             Warning(
-                "The package 'codebase-memory-mcp' is not installed on the system.",
+                "The package 'codebase-memory-mcp' is not installed globally on the system.",
                 hint=(
-                    "The 'codebase-memory-mcp' is an MCP server that indexes your codebase into "
-                    "a local knowledge graph, allowing AI agents to understand structures "
-                    "and relationships between classes without wasting tokens.\n\n"
+                    "The 'codebase-memory-mcp' is a global system MCP server that indexes your "
+                    "codebase into a local knowledge graph, allowing AI agents to understand "
+                    "structures and relationships between classes without wasting tokens.\n\n"
                     "Benefits of having codebase-memory-mcp in the system:\n"
                     "  - 🗺️ Knowledge Graph: Maps dependencies, classes, routes, and tables.\n"
                     "  - 🔎 Intelligent Search: Enables advanced, ultra-fast semantic searches.\n"
                     "  - 📉 Context Efficiency: Reduces token consumption and avoids redundant reads.\n\n"
-                    "How to install:\n"
+                    "How to install globally:\n"
                     "  Run (Linux/macOS): curl -fsSL "
-                    "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash\n"
-                    "  Or via pip: pip install codebase-memory-mcp\n"
-                    "  Or via npm: npm install -g codebase-memory-mcp\n\n"
-                    "Visualize the knowledge graph and explore its structure using the web interface:\n"
-                    "  Interface UI: https://github.com/DeusData/codebase-memory-mcp-ui"
+                    "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh "
+                    "| bash -s -- --ui\n"
+                    "  Or via npm: npm install -g codebase-memory-mcp"
                 ),
                 id="guardian.W004",
             )
@@ -51,12 +49,12 @@ def check_codebase_memory_installed(app_configs, **kwargs):
     else:
         checks_results.append(
             Info(
-                "The package 'codebase-memory-mcp' is installed and ready for use!",
+                "The package 'codebase-memory-mcp' is installed globally and ready for use!",
                 hint=(
-                    "To index this repository into the MCP local knowledge graph, run:\n"
-                    "  codebase-memory-mcp index .\n\n"
-                    "Visualize the knowledge graph and explore its structure using the web interface:\n"
-                    "  Interface UI: https://github.com/DeusData/codebase-memory-mcp-ui\n\n"
+                    "To enable auto-indexing at your project root, run:\n"
+                    "  codebase-memory-mcp config set auto_index true\n\n"
+                    "To visualize the knowledge graph and explore its structure, run the UI:\n"
+                    "  codebase-memory-mcp --ui=true --port=9749\n\n"
                     "This will provide highly precise graph-based semantic searches to your AI assistant."
                 ),
                 id="guardian.I002",

@@ -110,8 +110,15 @@ When applying theoretical principles like SOLID, DRY, YAGNI, or Clean Code, tran
 You are OBLIGATED to verify that the tools from both `django-ai-boost` and `codebase-memory-mcp` are loaded and active in your active session.
 
 If you detect that `django-ai-boost` or `codebase-memory-mcp` tools are missing from your active tool declarations, proactively guide the developer to configure them:
-1. **Explain the benefits** and suggest installing them via their terminal (e.g., running `uv add --dev django-ai-boost`).
-2. **Propose creating or updating their local `.gemini/settings.json` file** in their project root. Show them the exact JSON configuration, dynamically substituting `DJANGO_SETTINGS_MODULE` with their project's settings module (e.g., dynamically detected as `gpurent.settings` or `tests.settings` from the environment).
+1. **Explain the benefits** and suggest installing them:
+   - **`django-ai-boost`:** Run `uv add --dev django-ai-boost` inside the project.
+   - **`codebase-memory-mcp` (must be installed globally):** Run the official script:
+     `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash -s -- --ui`
+2. **Propose setting up auto-indexing** at the root of their project to keep the graph automatically in sync:
+   `codebase-memory-mcp config set auto_index true`
+3. **Offer the exact command to spin up the visual UI** on port `9749` when they ask to visualize or explore the codebase graph:
+   `codebase-memory-mcp --ui=true --port=9749`
+4. **Propose creating or updating their local `.gemini/settings.json` file** in their project root. Show them the exact JSON configuration, dynamically substituting `DJANGO_SETTINGS_MODULE` with their project's settings module (e.g., dynamically detected as `gpurent.settings` or `tests.settings` from the environment).
    *Example configuration:*
    ```json
    {
@@ -133,7 +140,7 @@ If you detect that `django-ai-boost` or `codebase-memory-mcp` tools are missing 
      }
    }
    ```
-3. **Ask for explicit consent** before writing or updating `.gemini/settings.json` for them.
+5. **Ask for explicit consent** before writing or updating `.gemini/settings.json` or running indexing configurations for them.
 
 When operating in an environment equipped with these MCP servers, you must use them to **empirically validate** assumptions rather than guessing:
 

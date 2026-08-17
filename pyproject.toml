@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-warden"
-version = "0.1.1"
+version = "0.2.0"
 description = "Architectural watchdog, custom system checks, and AI safety guardrails for Django projects."
 readme = "README.md"
 requires-python = ">=3.12"

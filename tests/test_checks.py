@@ -98,7 +98,7 @@ class TestAIBoostChecks(TestCase):
         infos = [e for e in errors if e.id == "warden.I001"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'django-ai-boost' is installed", infos[0].msg)
-        self.assertIn("django-ai-boost --settings", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
 
 class TestCodebaseMemoryChecks(TestCase):
@@ -125,7 +125,7 @@ class TestCodebaseMemoryChecks(TestCase):
         infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp config", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
     @patch("django_warden.checks.codebase.should_silence_mcp_info", return_value=False)
     @patch("shutil.which")
@@ -138,7 +138,7 @@ class TestCodebaseMemoryChecks(TestCase):
         infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp config", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
 
 class TestBestPracticesChecks(TestCase):

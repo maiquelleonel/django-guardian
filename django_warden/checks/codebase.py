@@ -10,7 +10,7 @@ def check_codebase_memory_installed(app_configs, **kwargs):
     """
     Checks if 'codebase-memory-mcp' is installed in the current environment or system path.
     If not, returns a Warning with details on installation benefits and instructions.
-    If installed, returns an Info check showing how to run it.
+    If installed, returns an Info check showing success.
     """
     checks_results = []
 
@@ -53,13 +53,6 @@ def check_codebase_memory_installed(app_configs, **kwargs):
             checks_results.append(
                 Info(
                     "The package 'codebase-memory-mcp' is installed globally and ready for use!",
-                    hint=(
-                        "To enable auto-indexing at your project root, run:\n"
-                        "  codebase-memory-mcp config set auto_index true\n\n"
-                        "To visualize the knowledge graph and explore its structure, run the UI:\n"
-                        "  codebase-memory-mcp --ui=true --port=9749\n\n"
-                        "This will provide highly precise graph-based semantic searches to your AI assistant."
-                    ),
                     id="warden.I002",
                 )
             )

@@ -48,7 +48,7 @@ def check_signals_windmill_loops(app_configs, **kwargs):
                                 "Ensure it has an exit clause (e.g., checks 'created', "
                                 "matching state, or uses @prevent_windmill_loops)."
                             ),
-                            id="guardian.W002",
+                            id="warden.W002",
                         )
                     )
 

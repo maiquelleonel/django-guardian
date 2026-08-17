@@ -1,6 +1,6 @@
-# 🤝 Contributing to django-guardian
+# 🤝 Contributing to django-warden
 
-Thank you for your interest in contributing to **django-guardian**! We welcome contributions from human developers and AI assistants alike to help build the best architectural watchdog and AI safety framework for Django projects.
+Thank you for your interest in contributing to **django-warden**! We welcome contributions from human developers and AI assistants alike to help build the best architectural watchdog and AI safety framework for Django projects.
 
 ## 🛡️ Coding Standards & SLAs
 
@@ -17,8 +17,8 @@ To set up your local development environment:
 
 1. **Clone the repository:**
    ```bash
-   git clone git@github.com:maiquelleonel/django-guardian.git
-   cd django-guardian
+   git clone git@github.com:maiquelleonel/django-warden.git
+   cd django-warden
    ```
 2. **Set up virtual environment using `uv`:**
    ```bash

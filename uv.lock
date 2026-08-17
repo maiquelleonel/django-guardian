@@ -329,7 +329,7 @@ wheels = [
 ]
 
 [[package]]
-name = "django-guardian"
+name = "django-warden"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

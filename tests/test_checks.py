@@ -5,27 +5,27 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.test import TestCase
 
-from django_guardian.decorators import prevent_windmill_loops
+from django_warden.decorators import prevent_windmill_loops
 
 
 class UnindexedModel(models.Model):
-    # This field contains 'email', which should trigger guardian.W001
+    # This field contains 'email', which should trigger warden.W001
     contact_email = models.CharField(max_length=255)
 
     class Meta:
-        app_label = "django_guardian"  # Match our installed app
+        app_label = "django_warden"  # Match our installed app
 
 
 class SafeIndexedModel(models.Model):
     contact_email = models.CharField(max_length=255, db_index=True)
 
     class Meta:
-        app_label = "django_guardian"
+        app_label = "django_warden"
 
 
 class GodModel(models.Model):
     class Meta:
-        app_label = "django_guardian"
+        app_label = "django_warden"
 
     def process_payment(self):
         # Using requests terms to simulate external integration
@@ -38,7 +38,7 @@ class TestDatabaseChecks(TestCase):
         errors = run_checks(tags=["database"])
 
         # We expect a warning for UnindexedModel.contact_email
-        warnings = [e for e in errors if e.id == "guardian.W001"]
+        warnings = [e for e in errors if e.id == "warden.W001"]
         self.assertTrue(len(warnings) >= 1)
         self.assertIn("contact_email", warnings[0].msg)
         self.assertIn("UnindexedModel", warnings[0].msg)
@@ -53,7 +53,7 @@ class TestSignalChecks(TestCase):
         post_save.connect(unsafe_receiver, sender=SafeIndexedModel, dispatch_uid="unsafe_test_uid")
         try:
             errors = run_checks(tags=["models"])
-            warnings = [e for e in errors if e.id == "guardian.W002"]
+            warnings = [e for e in errors if e.id == "warden.W002"]
             self.assertTrue(len(warnings) >= 1)
             self.assertIn("unsafe_receiver", warnings[0].msg)
         finally:
@@ -68,7 +68,7 @@ class TestSignalChecks(TestCase):
         post_save.connect(safe_receiver, sender=SafeIndexedModel, dispatch_uid="safe_test_uid")
         try:
             errors = run_checks(tags=["models"])
-            warnings = [e for e in errors if e.id == "guardian.W002" and "safe_receiver" in e.msg]
+            warnings = [e for e in errors if e.id == "warden.W002" and "safe_receiver" in e.msg]
             self.assertEqual(len(warnings), 0)
         finally:
             post_save.disconnect(safe_receiver, sender=SafeIndexedModel, dispatch_uid="safe_test_uid")
@@ -84,7 +84,7 @@ class TestAIBoostChecks(TestCase):
         mock_find_spec.return_value = None
 
         errors = run_checks()
-        warnings = [e for e in errors if e.id == "guardian.W003"]
+        warnings = [e for e in errors if e.id == "warden.W003"]
         self.assertEqual(len(warnings), 1)
         self.assertIn("The package 'django-ai-boost' is not installed", warnings[0].msg)
         self.assertIn("How to install", warnings[0].hint)
@@ -94,7 +94,7 @@ class TestAIBoostChecks(TestCase):
         mock_distribution.return_value = "fake_distribution"
 
         errors = run_checks()
-        infos = [e for e in errors if e.id == "guardian.I001"]
+        infos = [e for e in errors if e.id == "warden.I001"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'django-ai-boost' is installed", infos[0].msg)
         self.assertIn("django-ai-boost --settings", infos[0].hint)
@@ -110,7 +110,7 @@ class TestCodebaseMemoryChecks(TestCase):
         mock_distribution.side_effect = importlib.metadata.PackageNotFoundError
 
         errors = run_checks()
-        warnings = [e for e in errors if e.id == "guardian.W004"]
+        warnings = [e for e in errors if e.id == "warden.W004"]
         self.assertEqual(len(warnings), 1)
         self.assertIn("The package 'codebase-memory-mcp' is not installed", warnings[0].msg)
         self.assertIn("How to install", warnings[0].hint)
@@ -120,7 +120,7 @@ class TestCodebaseMemoryChecks(TestCase):
         mock_which.return_value = "/usr/local/bin/codebase-memory-mcp"
 
         errors = run_checks()
-        infos = [e for e in errors if e.id == "guardian.I002"]
+        infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
         self.assertIn("codebase-memory-mcp config", infos[0].hint)
@@ -132,15 +132,15 @@ class TestCodebaseMemoryChecks(TestCase):
         mock_distribution.return_value = "fake_distribution"
 
         errors = run_checks()
-        infos = [e for e in errors if e.id == "guardian.I002"]
+        infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
         self.assertIn("codebase-memory-mcp config", infos[0].hint)
 
 
 class TestBestPracticesChecks(TestCase):
-    @patch("django_guardian.checks.best_practices.os.walk")
-    @patch("django_guardian.checks.best_practices.open", create=True)
+    @patch("django_warden.checks.best_practices.os.walk")
+    @patch("django_warden.checks.best_practices.open", create=True)
     def test_check_detects_naive_datetime(self, mock_open, mock_walk):
         # Setup mocks
         mock_walk.return_value = [("/mock/path", [], ["views.py"])]
@@ -151,14 +151,14 @@ class TestBestPracticesChecks(TestCase):
         ]
 
         errors = run_checks()
-        warnings = [e for e in errors if e.id == "guardian.W005"]
+        warnings = [e for e in errors if e.id == "warden.W005"]
         self.assertEqual(len(warnings), 1)
         self.assertIn("Usage of naive datetime detected", warnings[0].msg)
         self.assertIn("views.py", warnings[0].msg)
         self.assertIn("timezone.now", warnings[0].hint)
 
-    @patch("django_guardian.checks.best_practices.os.walk")
-    @patch("django_guardian.checks.best_practices.open", create=True)
+    @patch("django_warden.checks.best_practices.os.walk")
+    @patch("django_warden.checks.best_practices.open", create=True)
     def test_check_detects_requests_without_timeout(self, mock_open, mock_walk):
         # Setup mocks
         mock_walk.return_value = [("/mock/path", [], ["services.py"])]
@@ -170,7 +170,7 @@ class TestBestPracticesChecks(TestCase):
         ]
 
         errors = run_checks()
-        warnings = [e for e in errors if e.id == "guardian.W006"]
+        warnings = [e for e in errors if e.id == "warden.W006"]
         self.assertEqual(len(warnings), 1)
         self.assertIn("HTTP call to 'requests' without timeout", warnings[0].msg)
         self.assertIn("services.py", warnings[0].msg)
@@ -180,7 +180,7 @@ class TestBestPracticesChecks(TestCase):
 class TestGodModelChecks(TestCase):
     def test_god_model_check_detects_unsafe_integration(self):
         errors = run_checks(tags=["models"])
-        warnings = [e for e in errors if e.id == "guardian.W007"]
+        warnings = [e for e in errors if e.id == "warden.W007"]
         self.assertTrue(len(warnings) >= 1)
         self.assertIn("GodModel", warnings[0].msg)
         self.assertIn("services.py", warnings[0].hint)
@@ -193,10 +193,10 @@ class TestGuardianAuditCommand(TestCase):
         from django.core.management import call_command
 
         out = StringIO()
-        call_command("guardian_audit", stdout=out)
+        call_command("warden_audit", stdout=out)
         output = out.getvalue()
 
-        self.assertIn("DJANGO GUARDIAN ARCHITECTURAL AUDIT", output)
+        self.assertIn("DJANGO WARDEN ARCHITECTURAL AUDIT", output)
         self.assertIn("Running System Integrity Checks", output)
         self.assertIn("Auditing Production Readiness", output)
         self.assertIn("Auditing Middlewares", output)

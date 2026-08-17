@@ -34,7 +34,7 @@ def _scan_file_for_issues(file_path, app_name, file_name):
                             "'django.utils.timezone.now()' to ensure proper "
                             "timezone support and production compliance."
                         ),
-                        id="guardian.W005",
+                        id="warden.W005",
                     )
                 )
 
@@ -52,7 +52,7 @@ def _scan_file_for_issues(file_path, app_name, file_name):
                             f"requests.{http_method}(url, timeout=5)) to prevent "
                             "sync threads from hanging indefinitely."
                         ),
-                        id="guardian.W006",
+                        id="warden.W006",
                     )
                 )
     return warnings

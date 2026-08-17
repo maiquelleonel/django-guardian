@@ -1,8 +1,8 @@
-# 🛡️ django-guardian
+# 🛡️ django-warden
 
 An opinionated AI skill, watchdog, and custom system checks framework to scale Django projects from zero to millions of users.
 
-`django-guardian` ensures that human developers and Gemini CLI assistants write clean, performant, and secure Django code. It combines static LLM instructions (the Guardian Skill) with dynamic, active Django system checks and Model Context Protocol (MCP) tooling, embodying battle-tested industry guidelines.
+`django-warden` ensures that human developers and Gemini CLI assistants write clean, performant, and secure Django code. It combines static LLM instructions (the Warden Skill) with dynamic, active Django system checks and Model Context Protocol (MCP) tooling, embodying battle-tested industry guidelines.
 
 ## 🚀 Features
 
@@ -13,7 +13,7 @@ An opinionated AI skill, watchdog, and custom system checks framework to scale D
 
 ## 🧩 Opinionated Architecture Philosophy
 
-`django-guardian` is designed to guide a Django project from **day zero to millions of clients**, enforcing architectural boundaries that keep codebases decoupling-friendly, highly testable, and robust under scale:
+`django-warden` is designed to guide a Django project from **day zero to millions of clients**, enforcing architectural boundaries that keep codebases decoupling-friendly, highly testable, and robust under scale:
 
 - **Lean Models & Thin Views:** Views should only handle HTTP concerns. Models should only handle data structure and simple properties.
 - **Services vs. Orchestrators (SOLID):**
@@ -27,28 +27,28 @@ An opinionated AI skill, watchdog, and custom system checks framework to scale D
 To install the custom system checks linter package:
 
 ```bash
-uv add django-guardian
+uv add django-warden
 ```
 
-Then add `"django_guardian"` to your `INSTALLED_APPS` in `settings.py`:
+Then add `"django_warden"` to your `INSTALLED_APPS` in `settings.py`:
 
 ```python
 INSTALLED_APPS = [
     ...,
-    "django_guardian",
+    "django_warden",
 ]
 ```
 
 ## 🤖 How to Load the AI Skill (Gemini CLI Setup)
 
-To make the Gemini CLI assistant strictly follow the `django-guardian` architectural guidelines, load the root-level `SKILL.md` file into its context before coding using the native CLI command:
+To make the Gemini CLI assistant strictly follow the `django-warden` architectural guidelines, load the root-level `SKILL.md` file into its context before coding using the native CLI command:
 
 ```bash
 # Install globally for all your projects
-bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-guardian.git --consent
+bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-warden.git --consent
 
 # Or install locally for the current project workspace only
-bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-guardian.git --scope workspace --consent
+bunx @google/gemini-cli skills install git@github.com:maiquelleonel/django-warden.git --scope workspace --consent
 ```
 
 ## 📜 License

@@ -44,7 +44,7 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
                     "  Or using uv: uv pip install django-ai-boost\n"
                     "  For local development: uv pip install -e '.[dev]'"
                 ),
-                id="guardian.W003",
+                id="warden.W003",
             )
         )
     else:
@@ -57,14 +57,14 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
                     f"Or add this configuration to your MCP client (e.g., Claude Desktop):\n"
                     f"{{\n"
                     f'  "mcpServers": {{\n'
-                    f'    "django-guardian": {{\n'
+                    f'    "django-warden": {{\n'
                     f'      "command": "django-ai-boost",\n'
                     f'      "args": ["--settings", "{settings_module}"]\n'
                     f"    }}\n"
                     f"  }}\n"
                     f"}}"
                 ),
-                id="guardian.I001",
+                id="warden.I001",
             )
         )
 

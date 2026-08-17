@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "django-guardian"
+name = "django-warden"
 version = "0.1.0"
 description = "Architectural watchdog, custom system checks, and AI safety guardrails for Django projects."
 readme = "README.md"
@@ -23,7 +23,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["django_guardian"]
+packages = ["django_warden"]
 
 [tool.ruff]
 line-length = 120

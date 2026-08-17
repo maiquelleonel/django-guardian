@@ -41,7 +41,7 @@ def check_search_fields_indexing(app_configs, **kwargs):
                             hint=(
                                 "Set 'db_index=True' or 'unique=True' on this field declaration to prevent table scans."
                             ),
-                            id="guardian.W001",
+                            id="warden.W001",
                             obj=field,
                         )
                     )
@@ -98,7 +98,7 @@ def check_model_god_objects(app_configs, **kwargs):
                         "or orchestrator layer ('orchestrators/'). This keeps your models clean (Lean Models) "
                         "and makes the application delivery-agnostic (Views, DRF, or Django Ninja)."
                     ),
-                    id="guardian.W007",
+                    id="warden.W007",
                     obj=model,
                 )
             )

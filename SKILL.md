@@ -1,13 +1,13 @@
 ---
-name: django-guardian
+name: django-warden
 description: Architectural linter, quality auditor, and idiom expert for Django & DRF. Use when creating, modifying, or auditing Models, Views, Serializers, Signals, and ORM Queries to enforce "The Django Way", prevent performance traps, and utilize the django-ai-boost MCP server.
 ---
 
-# 🛡️ Django Guardian & Expert Skill
+# 🛡️ Django Warden & Expert Skill
 
 ## Overview
 
-The `django-guardian` is an architectural watchdog and performance expert. It prevents AI models and human developers from "fighting the framework," ensuring all code aligns perfectly with **The Django Way**, maintains extreme security and performance (avoiding N+1 queries or memory waste), and leverages the `django-ai-boost` MCP Server for active introspection and linting.
+The `django-warden` is an architectural watchdog and performance expert. It prevents AI models and human developers from "fighting the framework," ensuring all code aligns perfectly with **The Django Way**, maintains extreme security and performance (avoiding N+1 queries or memory waste), and leverages the `django-ai-boost` MCP Server for active introspection and linting.
 
 ---
 
@@ -27,30 +27,30 @@ You must act as a collaborative, highly-skilled peer-programming Staff Engineer:
 
 ### 1. 🗄️ ORM & Performance First (Vinta Expert Rule)
 - **Avoid N+1 Queries:** Never traverse foreign keys or relationships inside loops (e.g. `for x in list: x.foreign_key.y`).
-  - *Guardian Action:* Always use `select_related()` for forward One-to-One and ForeignKey fields. Use `prefetch_related()` for Many-to-Many, generic relations, or reverse ForeignKeys.
+  - *Warden Action:* Always use `select_related()` for forward One-to-One and ForeignKey fields. Use `prefetch_related()` for Many-to-Many, generic relations, or reverse ForeignKeys.
 - **Stop In-Memory Filtering:** Never fetch large collections with `.all()` only to filter, sort, or sum them using Python's built-in functions (like `list.sort()`, `filter()`, or manual iteration).
-  - *Guardian Action:* Force the database to do the heavy lifting using Django's native `.filter()`, `.exclude()`, `.annotate()`, and database aggregators (`Sum`, `Count`, `Avg`, `Exists`).
+  - *Warden Action:* Force the database to do the heavy lifting using Django's native `.filter()`, `.exclude()`, `.annotate()`, and database aggregators (`Sum`, `Count`, `Avg`, `Exists`).
 - **Encapsulate Complex Queries:** Do not write long chains of raw `.filter()` directly inside views.
-  - *Guardian Action:* Encapsulate complex queries inside Custom `QuerySet` or `Manager` classes on the Model (serving as the Query/Selector layer).
+  - *Warden Action:* Encapsulate complex queries inside Custom `QuerySet` or `Manager` classes on the Model (serving as the Query/Selector layer).
 - **No Hidden Queries in Properties:** Avoid database queries (e.g., `filter()`, `count()`) inside `@property` methods on Models, as they trigger silent, unoptimized DB queries during serialization.
-  - *Guardian Action:* Annotate the necessary data onto the queryset before serialization, or use prefetch/aggregation.
+  - *Warden Action:* Annotate the necessary data onto the queryset before serialization, or use prefetch/aggregation.
 - **Use `update_fields` on Save:** When saving updates to an existing model instance, avoid updating the entire row.
-  - *Guardian Action:* Always pass the `update_fields` argument to `.save()` (e.g., `instance.save(update_fields=["status"])`) to prevent race conditions and optimize DB writes.
+  - *Warden Action:* Always pass the `update_fields` argument to `.save()` (e.g., `instance.save(update_fields=["status"])`) to prevent race conditions and optimize DB writes.
 
 ### 2. 🎛️ Input Validation & Serializers
 - **No Manual Dict Parsing:** Never manually parse input payloads or write custom `if "field" not in data:` validations inside Views, Admins, or Services.
-  - *Guardian Action:* All structural validation, payload sanitization, and type checking must reside inside DRF `Serializers` or Django `Forms`.
+  - *Warden Action:* All structural validation, payload sanitization, and type checking must reside inside DRF `Serializers` or Django `Forms`.
 - **Safe Persistence:** Never execute `.save()` on a serializer or view without explicitly invoking and validating `is_valid(raise_exception=True)`.
 
 ### 3. 🚨 Signal Windmills & Efeitos Colaterais (The Infinite Loop Trap)
 - **Windmill Loop Prevention:** Connecting a `post_save` or `pre_save` signal that saves the same object instance recursively is strictly forbidden.
-  - *Guardian Action:* Ensure every signal receiver that invokes `.save()` contains an explicit escape clause (e.g., checking `created`, matching a field value condition, or passing a specific `update_fields` argument to prevent recursion) or uses `@prevent_windmill_loops`.
+  - *Warden Action:* Ensure every signal receiver that invokes `.save()` contains an explicit escape clause (e.g., checking `created`, matching a field value condition, or passing a specific `update_fields` argument to prevent recursion) or uses `@prevent_windmill_loops`.
 
 ### 4. 🔒 Security & Secrets Management
 - **No Hardcoded Secrets:** Never embed API keys, passwords, credentials, or development URLs in python files or prompts.
-  - *Guardian Action:* Force reading secrets through `django.conf.settings`, which consume them from environment variables (`.env`).
+  - *Warden Action:* Force reading secrets through `django.conf.settings`, which consume them from environment variables (`.env`).
 - **Object-Level Perms boundary (Anti-IDOR):** Never look up database items using a bare model query based solely on client-provided IDs (e.g., `Model.objects.get(id=pk)`).
-  - *Guardian Action:* Always scope the query using user or tenant context (e.g., in CBVs or ViewSets, override `get_queryset()` to filter by owner: `self.queryset.filter(user=self.request.user)`).
+  - *Warden Action:* Always scope the query using user or tenant context (e.g., in CBVs or ViewSets, override `get_queryset()` to filter by owner: `self.queryset.filter(user=self.request.user)`).
 
 ### 5. 🗺️ Thin Views & Lean Models (Anti-God Object Rule)
 - **Thin Views / Thin Admins:** Keep `views.py` and `admin.py` strictly thin, focused solely on data exposure and presentation.
@@ -61,19 +61,19 @@ You must act as a collaborative, highly-skilled peer-programming Staff Engineer:
 
 ### 6. 🕒 Datetimes & Time Zones (Production Standard)
 - **No Naive Datetimes:** Avoid using naive python datetimes (`datetime.now()`, `datetime.utcnow()`).
-  - *Guardian Action:* Always use `django.utils.timezone.now()` to get time zone-aware datetimes.
+  - *Warden Action:* Always use `django.utils.timezone.now()` to get time zone-aware datetimes.
 
 ### 7. 🔌 External APIs & Background Tasks
 - **Never Block Sync Threads:** Never call external HTTP APIs without an explicit timeout threshold.
-  - *Guardian Action:* Always include a `timeout` parameter in `requests` calls (e.g. `requests.get(url, timeout=5)`).
+  - *Warden Action:* Always include a `timeout` parameter in `requests` calls (e.g. `requests.get(url, timeout=5)`).
 - **Avoid Celery Race Conditions:** Never invoke background tasks (e.g. `task.delay()`) directly inside transactional blocks without committing the state first.
-  - *Guardian Action:* Use `transaction.on_commit(lambda: task.delay())` to ensure the database record actually exists before the worker attempts to process it.
+  - *Warden Action:* Use `transaction.on_commit(lambda: task.delay())` to ensure the database record actually exists before the worker attempts to process it.
 
 ### 8. 🧪 Testing & Permission Habits
 - **The Negative Permission Rule:** Every view protected by permission checks must have corresponding negative test cases.
-  - *Guardian Action:* Assert a `403 Forbidden` or `404 Not Found` response for unauthorized/unauthenticated users.
+  - *Warden Action:* Assert a `403 Forbidden` or `404 Not Found` response for unauthorized/unauthenticated users.
 - **Behavior-Focused Test Factories:** Avoid manually instantiating models with large amounts of dummy fields in unit tests.
-  - *Guardian Action:* Use behavior factories (e.g., `factory_boy` or simple factory helper methods `make_user(**overrides)`) to keep tests clean and focused on actual behavior.
+  - *Warden Action:* Use behavior factories (e.g., `factory_boy` or simple factory helper methods `make_user(**overrides)`) to keep tests clean and focused on actual behavior.
 
 ### 9. 📦 Recommended Production Packages (The Standard Stack)
 If these packages are already available or requested by the user, configure and leverage them according to best practices:
@@ -87,20 +87,20 @@ If these packages are already available or requested by the user, configure and 
 
 ### 10. ⚠️ Silent but Dangerous Errors (Reliability & Observability)
 - **Specific Exception Handling:** Never use empty `except:` or catch `Exception` broadly without logging or re-raising.
-  - *Guardian Action:* Always catch specific exceptions (e.g. `ObjectDoesNotExist`, `RequestException`) and log them with appropriate context (`logger.exception`).
+  - *Warden Action:* Always catch specific exceptions (e.g. `ObjectDoesNotExist`, `RequestException`) and log them with appropriate context (`logger.exception`).
 - **Validate Bulk Updates/Deletes:** Operations like `.update()` and `.delete()` skip model saves and signals and fail silently if no records match.
-  - *Guardian Action:* Check the return count of updates/deletes. If an update expected to modify exactly 1 row fails (`updated != 1`), raise a domain exception or log a warning.
+  - *Warden Action:* Check the return count of updates/deletes. If an update expected to modify exactly 1 row fails (`updated != 1`), raise a domain exception or log a warning.
 - **Synchronous Signals Danger:** Signals are synchronous. If they fail, they will roll back the current database transaction.
-  - *Guardian Action:* Prefer explicit service calls over signals for side effects, or ensure signal receivers are heavily guarded and catch/log all exceptions internally.
+  - *Warden Action:* Prefer explicit service calls over signals for side effects, or ensure signal receivers are heavily guarded and catch/log all exceptions internally.
 
 ### 11. 🧩 SOLID, Clean Code, & Anti-Overengineering (The Django Way)
 When applying theoretical principles like SOLID, DRY, YAGNI, or Clean Code, translate them into concrete Django-native patterns rather than introducing overengineered layers:
 - **No Manual Repositories (YAGNI / DRY):** Do not write manual Repository or Unit of Work classes over Django's ORM. Django's Active Record pattern already abstracts database persistence.
-  - *Guardian Action:* Move reusable query filters into custom Model `QuerySet` or `Manager` subclasses instead of building abstract repository classes.
+  - *Warden Action:* Move reusable query filters into custom Model `QuerySet` or `Manager` subclasses instead of building abstract repository classes.
 - **No Manual DTOs (YAGNI / SOLID):** Do not build custom data transfer object (DTO) classes for input payloads.
-  - *Guardian Action:* Use Django `Forms` or DRF `Serializers` (or Pydantic schemas in Django Ninja) for input validation, sanitization, and data mapping.
+  - *Warden Action:* Use Django `Forms` or DRF `Serializers` (or Pydantic schemas in Django Ninja) for input validation, sanitization, and data mapping.
 - **Single Responsibility (SOLID - S) via Services:** Avoid turning models into God Objects that handle external integrations (emails, payments, webhooks).
-  - *Guardian Action:* Use standalone **Service Functions** (Domain Services) in `services.py` to orchestrate multi-step business actions and side effects, leaving the Model lean and focused on data rules.
+  - *Warden Action:* Use standalone **Service Functions** (Domain Services) in `services.py` to orchestrate multi-step business actions and side effects, leaving the Model lean and focused on data rules.
 - **Don't Fight the Framework (Clean Code):** Leverage Django's built-in batteries (e.g., CBVs, built-in validation, Django System Checks, and authentication backends) instead of writing custom, proprietary layers from scratch.
 
 ---

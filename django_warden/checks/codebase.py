@@ -43,7 +43,7 @@ def check_codebase_memory_installed(app_configs, **kwargs):
                     "| bash -s -- --ui\n"
                     "  Or via npm: npm install -g codebase-memory-mcp"
                 ),
-                id="guardian.W004",
+                id="warden.W004",
             )
         )
     else:
@@ -57,7 +57,7 @@ def check_codebase_memory_installed(app_configs, **kwargs):
                     "  codebase-memory-mcp --ui=true --port=9749\n\n"
                     "This will provide highly precise graph-based semantic searches to your AI assistant."
                 ),
-                id="guardian.I002",
+                id="warden.I002",
             )
         )
 

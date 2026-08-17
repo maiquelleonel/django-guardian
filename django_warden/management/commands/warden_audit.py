@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = "Runs a comprehensive, opinionated architectural and security audit of the Django project."
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.MIGRATE_HEADING("=== 🛡️ DJANGO GUARDIAN ARCHITECTURAL AUDIT ==="))
+        self.stdout.write(self.style.MIGRATE_HEADING("=== 🛡️ DJANGO WARDEN ARCHITECTURAL AUDIT ==="))
         self.stdout.write("Running deep analysis on settings, models, views, middlewares, and signals...\n")
 
         # Execute all auditing phases cleanly
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         warnings = 0
         infos = 0
         system_checks_issues = run_checks()
-        guardian_issues = [issue for issue in system_checks_issues if getattr(issue, "id", "").startswith("guardian.")]
+        guardian_issues = [issue for issue in system_checks_issues if getattr(issue, "id", "").startswith("warden.")]
 
         if not guardian_issues:
             self.stdout.write(self.style.SUCCESS("  ✔ All system integrity checks passed successfully!"))

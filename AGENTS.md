@@ -5,7 +5,7 @@ To maintain absolute architectural alignment, code consistency, and SLA complian
 ## 🧬 Single Source of Truth
 We enforce a **Single Source of Truth (SSOT)** for all automated agent instructions:
 - **Primary Directives:** Please refer immediately and exclusively to [GEMINI.md](./GEMINI.md) in the project root.
-- **Expert Skill Specification:** The detailed architectural skill guidelines reside inside [django_guardian/skills/SKILL.md](./django_guardian/skills/SKILL.md).
+- **Expert Skill Specification:** The detailed architectural skill guidelines reside inside [SKILL.md](./SKILL.md).
 
 ## 🚀 Loading Instructions
 Please load the contents of these files into your active context on your first turn before proposing any design strategies or writing any code.

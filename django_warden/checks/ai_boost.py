@@ -1,6 +1,6 @@
-import os
-
 from django.core.checks import Info, Warning, register
+
+from django_warden.config import should_silence_mcp_info
 
 
 @register()
@@ -8,7 +8,7 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
     """
     Checks if 'django-ai-boost' is installed in the current environment.
     If not, returns a Warning with details on installation benefits and instructions.
-    If installed, returns an Info check showing how to run it for the current project.
+    If installed, returns an Info check showing success.
     """
     checks_results = []
 
@@ -24,8 +24,6 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
 
         if importlib.util.find_spec("django_ai_boost") is not None:
             ai_boost_installed = True
-
-    settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "tests.settings")
 
     if not ai_boost_installed:
         checks_results.append(
@@ -48,24 +46,12 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
             )
         )
     else:
-        checks_results.append(
-            Info(
-                "The package 'django-ai-boost' is installed and ready for use!",
-                hint=(
-                    f"To connect your AI assistant to this Django project, run:\n"
-                    f"  django-ai-boost --settings {settings_module}\n\n"
-                    f"Or add this configuration to your MCP client (e.g., Claude Desktop):\n"
-                    f"{{\n"
-                    f'  "mcpServers": {{\n'
-                    f'    "django-warden": {{\n'
-                    f'      "command": "django-ai-boost",\n'
-                    f'      "args": ["--settings", "{settings_module}"]\n'
-                    f"    }}\n"
-                    f"  }}\n"
-                    f"}}"
-                ),
-                id="warden.I001",
+        if not should_silence_mcp_info():
+            checks_results.append(
+                Info(
+                    "The package 'django-ai-boost' is installed and ready for use!",
+                    id="warden.I001",
+                )
             )
-        )
 
     return checks_results

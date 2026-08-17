@@ -40,7 +40,11 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_LABEL("--- [1/5] Running System Integrity Checks ---"))
         warnings = 0
         infos = 0
-        system_checks_issues = run_checks()
+        os.environ["DJANGO_WARDEN_AUDIT_RUNNING"] = "1"
+        try:
+            system_checks_issues = run_checks()
+        finally:
+            os.environ.pop("DJANGO_WARDEN_AUDIT_RUNNING", None)
         guardian_issues = [issue for issue in system_checks_issues if getattr(issue, "id", "").startswith("warden.")]
 
         if not guardian_issues:

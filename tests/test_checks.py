@@ -89,15 +89,16 @@ class TestAIBoostChecks(TestCase):
         self.assertIn("The package 'django-ai-boost' is not installed", warnings[0].msg)
         self.assertIn("How to install", warnings[0].hint)
 
+    @patch("django_warden.checks.ai_boost.should_silence_mcp_info", return_value=False)
     @patch("importlib.metadata.distribution")
-    def test_check_passes_when_installed(self, mock_distribution):
+    def test_check_passes_when_installed(self, mock_distribution, mock_silence):
         mock_distribution.return_value = "fake_distribution"
 
         errors = run_checks()
         infos = [e for e in errors if e.id == "warden.I001"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'django-ai-boost' is installed", infos[0].msg)
-        self.assertIn("django-ai-boost --settings", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
 
 class TestCodebaseMemoryChecks(TestCase):
@@ -115,19 +116,21 @@ class TestCodebaseMemoryChecks(TestCase):
         self.assertIn("The package 'codebase-memory-mcp' is not installed", warnings[0].msg)
         self.assertIn("How to install", warnings[0].hint)
 
+    @patch("django_warden.checks.codebase.should_silence_mcp_info", return_value=False)
     @patch("shutil.which")
-    def test_check_passes_when_installed_via_path(self, mock_which):
+    def test_check_passes_when_installed_via_path(self, mock_which, mock_silence):
         mock_which.return_value = "/usr/local/bin/codebase-memory-mcp"
 
         errors = run_checks()
         infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp config", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
+    @patch("django_warden.checks.codebase.should_silence_mcp_info", return_value=False)
     @patch("shutil.which")
     @patch("importlib.metadata.distribution")
-    def test_check_passes_when_installed_via_pip(self, mock_distribution, mock_which):
+    def test_check_passes_when_installed_via_pip(self, mock_distribution, mock_which, mock_silence):
         mock_which.return_value = None
         mock_distribution.return_value = "fake_distribution"
 
@@ -135,7 +138,7 @@ class TestCodebaseMemoryChecks(TestCase):
         infos = [e for e in errors if e.id == "warden.I002"]
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'codebase-memory-mcp' is installed", infos[0].msg)
-        self.assertIn("codebase-memory-mcp config", infos[0].hint)
+        self.assertIsNone(infos[0].hint)
 
 
 class TestBestPracticesChecks(TestCase):
@@ -202,3 +205,47 @@ class TestGuardianAuditCommand(TestCase):
         self.assertIn("Auditing Middlewares", output)
         self.assertIn("Auditing Views", output)
         self.assertIn("ARCHITECTURAL AUDIT SUMMARY", output)
+
+
+class TestWardenConfigAndSilencing(TestCase):
+    @patch("django_warden.checks.ai_boost.should_silence_mcp_info", return_value=True)
+    @patch("importlib.metadata.distribution")
+    def test_checks_are_silenced_by_default_when_installed(self, mock_distribution, mock_silence):
+        mock_distribution.return_value = "fake_distribution"
+
+        errors = run_checks()
+        infos_ai = [e for e in errors if e.id == "warden.I001"]
+        self.assertEqual(len(infos_ai), 0)
+
+    @patch("django_warden.checks.codebase.should_silence_mcp_info", return_value=True)
+    @patch("shutil.which")
+    def test_codebase_check_is_silenced_by_default_when_installed(self, mock_which, mock_silence):
+        mock_which.return_value = "/usr/local/bin/codebase-memory-mcp"
+
+        errors = run_checks()
+        infos_cb = [e for e in errors if e.id == "warden.I002"]
+        self.assertEqual(len(infos_cb), 0)
+
+    @patch("django_warden.config.get_warden_config")
+    def test_should_silence_mcp_info_defaults_and_configs(self, mock_get_config):
+        from django_warden.config import should_silence_mcp_info
+
+        # Test Default (True) when not in audit
+        mock_get_config.return_value = {}
+        with patch.dict("os.environ", {}):
+            self.assertTrue(should_silence_mcp_info())
+
+        # Test True when explicitly configured true
+        mock_get_config.return_value = {"silence_mcp_info": True}
+        with patch.dict("os.environ", {}):
+            self.assertTrue(should_silence_mcp_info())
+
+        # Test False when explicitly configured false
+        mock_get_config.return_value = {"silence_mcp_info": False}
+        with patch.dict("os.environ", {}):
+            self.assertFalse(should_silence_mcp_info())
+
+        # Test False when running audit, regardless of config
+        mock_get_config.return_value = {"silence_mcp_info": True}
+        with patch.dict("os.environ", {"DJANGO_WARDEN_AUDIT_RUNNING": "1"}):
+            self.assertFalse(should_silence_mcp_info())

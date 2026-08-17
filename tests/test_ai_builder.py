@@ -50,6 +50,8 @@ class TestAIBuilder(TestCase):
             self.assertEqual(
                 settings_data["mcpServers"]["django-ai-boost"]["args"], ["--settings", "my_test_app.settings"]
             )
+            self.assertIn("codebase-memory-mcp", settings_data["mcpServers"])
+            self.assertEqual(settings_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")
 
     def test_claude_directory_detection(self):
         # Setup: create the .claude directory
@@ -153,8 +155,10 @@ class TestAIBuilder(TestCase):
             self.assertIn("custom-mcp", merged_data["mcpServers"])
             self.assertEqual(merged_data["mcpServers"]["custom-mcp"]["args"], ["custom.js"])
 
-            # Assert new MCP was merged successfully
+            # Assert new MCPs were merged successfully
             self.assertIn("django-ai-boost", merged_data["mcpServers"])
             self.assertEqual(
                 merged_data["mcpServers"]["django-ai-boost"]["args"], ["--settings", "merge_project.settings"]
             )
+            self.assertIn("codebase-memory-mcp", merged_data["mcpServers"])
+            self.assertEqual(merged_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")

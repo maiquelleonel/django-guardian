@@ -6,6 +6,7 @@ An opinionated AI skill, watchdog, and custom system checks framework to scale D
 
 ## 🚀 Features
 
+- **Example App:** Check out [gpurent](https://github.com/maiquelleonel/gpurent), a production-grade Django example project configured with `django-warden` demonstrating thin views, service layers, and zero-N+1 active auditing.
 - **Active System Checks:** Detects missing database indexes on common search/lookup fields and dangerous infinite recursive signal save loops (Windmill loops) at startup.
 - **Windmill Loop Protection:** Provides a `@prevent_windmill_loops` decorator to safely handle internal signals.
 - **AI Skill Integration:** Comes pre-packaged with an AI System Prompt (`SKILL.md`) that teaches the Gemini CLI assistant how to write code according to "The Django Way."

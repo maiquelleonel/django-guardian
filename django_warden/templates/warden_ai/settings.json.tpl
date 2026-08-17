@@ -6,6 +6,9 @@
         "--settings",
         "{{ settings_module }}"
       ]
+    },
+    "codebase-memory-mcp": {
+      "command": "codebase-memory-mcp"
     }
   }
 }

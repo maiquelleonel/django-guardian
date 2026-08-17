@@ -1,6 +1,2 @@
-# Ignora absolutamente tudo nesta pasta e subpastas
 *
-
-# Abre exceção APENAS para o arquivo de configuração e identificador da skill
 !SKILL.md
-!django-warden.skill

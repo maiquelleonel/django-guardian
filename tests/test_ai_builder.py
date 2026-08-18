@@ -17,10 +17,7 @@ class TestAIBuilder(TestCase):
         # Clean up the temporary directory
         shutil.rmtree(self.test_dir)
 
-    def test_gemini_directory_detection_and_creation(self):
-        # Setup: create the .gemini directory
-        os.makedirs(os.path.join(self.test_dir, ".gemini"), exist_ok=True)
-
+    def test_default_gemini_and_claude_directories_creation(self):
         context = {
             "project_name": "my_test_app",
             "settings_module": "my_test_app.settings",
@@ -28,90 +25,45 @@ class TestAIBuilder(TestCase):
 
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
-        # Assertions
-        self.assertEqual(targets, [".gemini"])
-        self.assertTrue(skill_created)
-        self.assertTrue(settings_created)
-
-        skill_file = os.path.join(self.test_dir, ".gemini", "skills", "django-warden", "SKILL.md")
-        self.assertTrue(os.path.exists(skill_file))
-
-        with open(skill_file, "r", encoding="utf-8") as f:
-            content = f.read()
-            self.assertIn("DJANGO GUARDIAN SKILL: MY_TEST_APP", content)
-            self.assertIn("my_test_app", content)
-
-        settings_file = os.path.join(self.test_dir, ".gemini", "settings.json")
-        self.assertTrue(os.path.exists(settings_file))
-
-        with open(settings_file, "r", encoding="utf-8") as f:
-            settings_data = json.load(f)
-            self.assertIn("django-ai-boost", settings_data["mcpServers"])
-            self.assertEqual(
-                settings_data["mcpServers"]["django-ai-boost"]["args"], ["--settings", "my_test_app.settings"]
-            )
-            self.assertIn("codebase-memory-mcp", settings_data["mcpServers"])
-            self.assertEqual(settings_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")
-
-    def test_claude_directory_detection(self):
-        # Setup: create the .claude directory
-        os.makedirs(os.path.join(self.test_dir, ".claude"), exist_ok=True)
-
-        context = {
-            "project_name": "claude_project",
-            "settings_module": "claude_project.settings",
-        }
-
-        targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
-
-        # Assertions
-        self.assertEqual(targets, [".claude"])
-        self.assertTrue(skill_created)
-        self.assertTrue(settings_created)
-
-        skill_file = os.path.join(self.test_dir, ".claude", "skills", "django-warden", "SKILL.md")
-        self.assertTrue(os.path.exists(skill_file))
-
-    def test_both_gemini_and_claude_directories_detection_and_creation(self):
-        # Setup: create BOTH .gemini and .claude directories
-        os.makedirs(os.path.join(self.test_dir, ".gemini"), exist_ok=True)
-        os.makedirs(os.path.join(self.test_dir, ".claude"), exist_ok=True)
-
-        context = {
-            "project_name": "dual_project",
-            "settings_module": "dual_project.settings",
-        }
-
-        targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
-
-        # Assertions
+        # Assertions: both .gemini and .claude are provisioned by default
         self.assertEqual(set(targets), {".gemini", ".claude"})
         self.assertTrue(skill_created)
         self.assertTrue(settings_created)
 
-        # Check SKILL.md and settings.json in .gemini
-        gemini_skill = os.path.join(self.test_dir, ".gemini", "skills", "django-warden", "SKILL.md")
-        gemini_settings = os.path.join(self.test_dir, ".gemini", "settings.json")
-        self.assertTrue(os.path.exists(gemini_skill))
-        self.assertTrue(os.path.exists(gemini_settings))
+        for target_dir in [".gemini", ".claude"]:
+            skill_file = os.path.join(self.test_dir, target_dir, "skills", "django-warden", "SKILL.md")
+            self.assertTrue(os.path.exists(skill_file))
 
-        # Check SKILL.md and settings.json in .claude
-        claude_skill = os.path.join(self.test_dir, ".claude", "skills", "django-warden", "SKILL.md")
-        claude_settings = os.path.join(self.test_dir, ".claude", "settings.json")
-        self.assertTrue(os.path.exists(claude_skill))
-        self.assertTrue(os.path.exists(claude_settings))
+            with open(skill_file, "r", encoding="utf-8") as f:
+                content = f.read()
+                self.assertIn("DJANGO GUARDIAN SKILL: MY_TEST_APP", content)
+                self.assertIn("my_test_app", content)
 
-    def test_fallback_to_agents_directory(self):
-        # Setup: do NOT create .gemini or .claude
+            settings_file = os.path.join(self.test_dir, target_dir, "settings.json")
+            self.assertTrue(os.path.exists(settings_file))
+
+            with open(settings_file, "r", encoding="utf-8") as f:
+                settings_data = json.load(f)
+                self.assertIn("django-ai-boost", settings_data["mcpServers"])
+                self.assertEqual(
+                    settings_data["mcpServers"]["django-ai-boost"]["args"], ["--settings", "my_test_app.settings"]
+                )
+                self.assertIn("codebase-memory-mcp", settings_data["mcpServers"])
+                self.assertEqual(settings_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")
+
+    def test_agents_directory_detected_and_included(self):
+        # Setup: create .agents directory
+        os.makedirs(os.path.join(self.test_dir, ".agents"), exist_ok=True)
+
         context = {
-            "project_name": "generic_project",
-            "settings_module": "generic_project.settings",
+            "project_name": "agents_project",
+            "settings_module": "agents_project.settings",
         }
 
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
         # Assertions
-        self.assertEqual(targets, [".agents"])
+        self.assertEqual(set(targets), {".gemini", ".claude", ".agents"})
         self.assertTrue(skill_created)
         self.assertTrue(settings_created)
 
@@ -140,9 +92,8 @@ class TestAIBuilder(TestCase):
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
         # Assertions
-        self.assertEqual(targets, [".gemini"])
+        self.assertEqual(set(targets), {".gemini", ".claude"})
         self.assertTrue(skill_created)
-        self.assertFalse(settings_created)  # False because settings.json already existed
 
         with open(settings_file_path, "r", encoding="utf-8") as f:
             merged_data = json.load(f)

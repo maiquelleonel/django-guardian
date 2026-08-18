@@ -191,20 +191,30 @@ class TestGodModelChecks(TestCase):
 
 class TestGuardianAuditCommand(TestCase):
     def test_guardian_audit_command_runs_successfully(self):
+        import shutil
+        import tempfile
         from io import StringIO
 
         from django.core.management import call_command
+        from django.test import override_settings
 
-        out = StringIO()
-        call_command("warden_audit", stdout=out)
-        output = out.getvalue()
+        temp_dir = tempfile.mkdtemp()
+        try:
+            with override_settings(BASE_DIR=temp_dir):
+                out = StringIO()
+                call_command("warden_audit", stdout=out)
+                output = out.getvalue()
 
-        self.assertIn("DJANGO WARDEN ARCHITECTURAL AUDIT", output)
-        self.assertIn("Running System Integrity Checks", output)
-        self.assertIn("Auditing Production Readiness", output)
-        self.assertIn("Auditing Middlewares", output)
-        self.assertIn("Auditing Views", output)
-        self.assertIn("ARCHITECTURAL AUDIT SUMMARY", output)
+                self.assertIn("DJANGO WARDEN ARCHITECTURAL AUDIT", output)
+                self.assertIn("[Warden]", output)
+                self.assertIn("AI skill & MCP servers", output)
+                self.assertIn("Running System Integrity Checks", output)
+                self.assertIn("Auditing Production Readiness", output)
+                self.assertIn("Auditing Middlewares", output)
+                self.assertIn("Auditing Views", output)
+                self.assertIn("ARCHITECTURAL AUDIT SUMMARY", output)
+        finally:
+            shutil.rmtree(temp_dir)
 
 
 class TestWardenConfigAndSilencing(TestCase):

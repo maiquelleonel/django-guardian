@@ -14,21 +14,21 @@ def get_template_content(template_name: str) -> str:
         return f.read()
 
 
+SUPPORTED_AI_DIRECTORIES = [".gemini", ".claude"]
+
+
 def _get_target_directories(base_dir: str) -> list[str]:
     """
-    Determines all active target directories based on what exists on the system.
+    Determines all active target directories for AI instructions and MCP settings.
+    Ensures primary supported assistants (.gemini, .claude) are always targeted,
+    plus any additional detected agent directories.
     """
-    targets = []
-    gemini_path = os.path.join(base_dir, ".gemini")
-    claude_path = os.path.join(base_dir, ".claude")
+    targets = list(SUPPORTED_AI_DIRECTORIES)
 
-    if os.path.isdir(gemini_path):
-        targets.append(".gemini")
-    if os.path.isdir(claude_path):
-        targets.append(".claude")
-
-    if not targets:
+    agents_path = os.path.join(base_dir, ".agents")
+    if os.path.isdir(agents_path) and ".agents" not in targets:
         targets.append(".agents")
+
     return targets
 
 

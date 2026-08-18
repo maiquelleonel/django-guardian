@@ -14,6 +14,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("=== 🛡️ DJANGO WARDEN ARCHITECTURAL AUDIT ==="))
         self.stdout.write("Running deep analysis on settings, models, views, middlewares, and signals...\n")
 
+        # Ensure AI instructions and MCP settings are configured
+        self._bootstrap_ai_structure()
+
         # Execute all auditing phases cleanly
         w1, i1 = self._audit_system_checks()
         w2, i2 = self._audit_settings()
@@ -35,6 +38,30 @@ class Command(BaseCommand):
             )
             self.stdout.write(self.style.WARNING(f"Estimated Architectural Compliance Rate: {compliance_rate}%"))
             self.stdout.write("Apply the hints above to scale your application seamlessly to millions of clients.")
+
+    def _bootstrap_ai_structure(self):
+        base_dir = getattr(settings, "BASE_DIR", None)
+        if not base_dir:
+            return
+
+        from django_warden.ai_builder import ensure_ai_structure
+
+        wsgi_app = getattr(settings, "WSGI_APPLICATION", None)
+        project_name = wsgi_app.split(".")[0] if wsgi_app else os.path.basename(base_dir)
+        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "config.settings")
+
+        context = {
+            "project_name": project_name,
+            "settings_module": settings_module,
+        }
+
+        target_dirs, skill_created, settings_created = ensure_ai_structure(base_dir, context)
+        dirs_str = ", ".join(f"'{d}/'" for d in target_dirs)
+
+        if skill_created or settings_created:
+            self.stdout.write(self.style.SUCCESS(f"✨ [Warden] Configured AI skill & MCP servers in {dirs_str}\n"))
+        else:
+            self.stdout.write(self.style.SUCCESS(f"✔ [Warden] AI skill & MCP servers are up-to-date in {dirs_str}\n"))
 
     def _audit_system_checks(self):
         self.stdout.write(self.style.MIGRATE_LABEL("--- [1/5] Running System Integrity Checks ---"))

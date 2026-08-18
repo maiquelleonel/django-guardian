@@ -1,4 +1,4 @@
-# 🧬 DJANGO GUARDIAN HARNESS & AI BOOTSTRAP DIRECTIVES
+# 🧬 GEMINI HARNESS & AI BOOTSTRAP DIRECTIVES
 
 Este arquivo dita as regras de inicialização e as diretivas de boot para qualquer Inteligência Artificial ou Agente Automatizado que operar neste repositório. Suas instruções possuem **precedência absoluta** sobre qualquer fluxo de trabalho geral.
 
@@ -6,10 +6,10 @@ Este arquivo dita as regras de inicialização e as diretivas de boot para qualq
 
 ## 🚨 1. REGRA DE OURO DE INICIALIZAÇÃO (First-Turn Command Rule)
 
-- **Ação Número Um (OBRIGATÓRIA):** Ao iniciar esta sessão, na sua **PRIMEIRA rodada de conversa (First Turn)**, você DEVE executar imediatamente o comando de ferramenta `read_file` para carregar e analisar a especificação da skill em `django_guardian/skills/SKILL.md`.
+- **Ação Número Um (OBRIGATÓRIA):** Ao iniciar esta sessão, na sua **PRIMEIRA rodada de conversa (First Turn)**, você DEVE executar imediatamente o comando de ferramenta `read_file` para carregar e analisar a especificação da skill em `SKILL.md`.
 - **Sem Ações Prematuras:** Você está expressamente PROIBIDO de propor estratégias, gerar códigos, responder perguntas ou aplicar qualquer modificação sem antes ter lido o `SKILL.md` por completo.
 - **🛡️ Validação de Skill Obrigatória (Django Guardian):**
-  - Você deve verificar se a skill `django-guardian` está instalada e ativa nesta sessão (ela deve ser ativada por demanda via `activate_skill` caso esteja instalada).
+  - Você deve verificar se a skill está instalada e ativa nesta sessão (ela deve ser ativada por demanda via `activate_skill` caso esteja instalada).
   - **🔌 Validação Obrigatória de Servidores MCP:**
     - Você DEVE validar se as ferramentas do MCP `django-ai-boost` (ex: `list_apps`, `get_model_schema`) estão carregadas e prontas no ambiente de execução do assistente.
 
@@ -33,24 +33,15 @@ Ao operar neste repositório, alinhe todos os seus comportamentos de escrita de 
 Este projeto utiliza o `django-ai-boost` como servidor MCP para otimizar o contexto e a capacidade de análise das ferramentas de IA.
 
 - **Configuração de Contexto Dinâmica:** O agente deve se autoajustar e atualizar as configurações locais do MCP Server do editor correspondente de forma automatizada (por exemplo, no arquivo de configuração do MCP), garantindo que o módulo de settings apontado seja sempre o módulo correto do projeto Django.
-- **Validação de Código Ativa:** O assistente deve utilizar ativamente a ferramenta `run_check` fornecida pelo `django-ai-boost` para validar em tempo real se alguma regra arquitetural do `django-guardian` foi violada.
+- **Validação de Código Ativa:** O assistente deve utilizar ativamente a ferramenta `run_check` fornecida pelo `django-ai-boost` para validar em tempo real se alguma regra arquitetural do `SKILL.md` foi violada.
 
 ---
 
-## 🧠 4. COGNITIVE ORCHESTRATION & AGENTIC WORKFLOW (Autonomia de Alto Nível)
+## 🛠️ 5. COMANDOS DO PROJETO (Justfile Automation)
 
-Adote uma postura proativa e rigorosa antes de marcar qualquer tarefa como concluída:
+O repositório utiliza o `Justfile` para automação do ciclo de desenvolvimento e verificação de conformidade:
 
-### 🎯 Gatilho de Planejamento Ativo (Plan-Before-Code)
-- **Threshold para Planejamento:** Qualquer tarefa que envolva mais de 3 etapas físicas, alteração em modelos de banco de dados (`models.py`), ou integrações externas complexas exige que você apresente seu plano de ação em tópicos curtos para aprovação antes de iniciar qualquer modificação física de arquivos.
+- `just test`: Executa a suíte de testes com `uv run tests/manage.py test tests -v 0`.
+- `just lint`: Executa a verificação estática de lint com `uv run ruff check .`.
+- `just fmt`: Aplica a formatação automática de código com `uv run ruff format .`.
 
-### 🛑 O "Desvio Estratégico" (A Regra dos 3 Erros)
-- **Prevenção de Loops de Correção:** Se você tentar aplicar uma correção de código ou de teste e ela falhar por 3 vezes consecutivas:
-  1. **Pare imediatamente** o fluxo de escrita.
-  2. Apresente um sumário listando suas premissas atuais.
-  3. Identifique qual delas pode estar incorreta e proponha uma rota de design alternativa, em vez de insistir em remendos pontuais.
-
-### 🧪 Verificação Rígida e Autocorreção Ativa
-- **Autonomia em Falhas:** Se a execução de testes acusar uma falha, analise os logs de erro de forma autônoma e proativa, abra os arquivos e aplique a correção necessária.
-- **Elegância do Código:** Sempre se pergunte: *"Esta é a maneira mais Pythonica e alinhada ao ecossistema Django de resolver este problema?"*
-- **Sincronização com o Django Guardian:** Enforce queries limpas sem N+1 (use `select_related`/`prefetch_related`), validação por serializadores em vez de dict parsing manual, e blindagem de signals contra loops infinitos de recursão.

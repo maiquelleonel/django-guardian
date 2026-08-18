@@ -46,11 +46,21 @@ You must act as a collaborative, highly-skilled peer-programming Staff Engineer:
 - **Windmill Loop Prevention:** Connecting a `post_save` or `pre_save` signal that saves the same object instance recursively is strictly forbidden.
   - *Warden Action:* Ensure every signal receiver that invokes `.save()` contains an explicit escape clause (e.g., checking `created`, matching a field value condition, or passing a specific `update_fields` argument to prevent recursion) or uses `@prevent_windmill_loops`.
 
-### 4. 🔒 Security & Secrets Management
+### 4. 🔒 Production Security & Zero-Trust (Anti-Exploit Rules)
 - **No Hardcoded Secrets:** Never embed API keys, passwords, credentials, or development URLs in python files or prompts.
   - *Warden Action:* Force reading secrets through `django.conf.settings`, which consume them from environment variables (`.env`).
-- **Object-Level Perms boundary (Anti-IDOR):** Never look up database items using a bare model query based solely on client-provided IDs (e.g., `Model.objects.get(id=pk)`).
-  - *Warden Action:* Always scope the query using user or tenant context (e.g., in CBVs or ViewSets, override `get_queryset()` to filter by owner: `self.queryset.filter(user=self.request.user)`).
+- **No Mass Assignment:** Never use `fields = "__all__"` on write serializers (`POST`/`PUT`/`PATCH`).
+  - *Warden Action:* Always explicitly declare allowed fields in `fields` and protect sensitive/privilege fields (`role`, `is_staff`, `is_superuser`, `tenant_id`, `balance`) via `read_only_fields`.
+- **Anti-IDOR by Design:** Never look up database items using a bare model query based solely on client-provided IDs (e.g., `Model.objects.get(id=pk)`).
+  - *Warden Action:* Always scope the query using user or tenant context (e.g., in CBVs or ViewSets, override `get_queryset()` to filter by owner: `self.queryset.filter(user=self.request.user)`), and inject owner into `.save(user=request.user)`.
+- **SSRF Defense (Server-Side Request Forgery):** Never execute `requests` or HTTP clients directly against user-supplied URLs without blocking local and private IP ranges.
+  - *Warden Action:* Strictly validate URL schemes (`http`/`https` only) and block requests resolving to loopback/internal addresses (`127.0.0.1`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.169.254`).
+- **Timing-Attack Resistance:** Never use standard `==` comparison for security tokens, API keys, webhook signatures, or password hashes.
+  - *Warden Action:* Always use `django.utils.crypto.constant_time_compare(val1, val2)` or `secrets.compare_digest()` for constant-time comparisons.
+- **SQL & Order Injection Guard:** Never concatenate strings or format f-strings inside `RawSQL`, `.raw()`, or dynamic `.order_by()`.
+  - *Warden Action:* Deprecate and avoid `.extra()`. Use parameterized query parameter binding (`params=[...]`), and validate dynamic sort fields against a strict allowlist.
+- **Safe Uploads & Deserialization:** Prohibit `pickle` deserialization on untrusted data streams; prevent Path Traversal/Zip Slip in uploads.
+  - *Warden Action:* Ban `pickle.loads()`/`pickle.load()` on external inputs (use `json` or `django.core.signing`). In file uploads, always sanitize file paths with `os.path.basename()` or use Django's `FileSystemStorage` / `upload_to`.
 
 ### 5. 🗺️ Thin Views & Lean Models (Anti-God Object Rule)
 - **Thin Views / Thin Admins:** Keep `views.py` and `admin.py` strictly thin, focused solely on data exposure and presentation.

@@ -12,7 +12,7 @@ class DjangoWardenConfig(AppConfig):
 
     def ready(self):
         # Dynamically import and register all custom system checks on startup
-        from django_warden.checks import database, signals, ai_boost, codebase, best_practices  # noqa
+        from django_warden.checks import database, signals, ai_boost, codebase, best_practices, security  # noqa
 
         # Auto-bootstrap AI instruction files in local development mode
         if getattr(settings, "DEBUG", False):

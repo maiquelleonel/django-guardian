@@ -23,8 +23,19 @@ Ao criar ou modificar código neste repositório:
 
 ---
 
-## 🔍 3. CHECKLIST ANTES DE ENTREGAR QUALQUER CÓDIGO
-1. **Queries:** Estou gerando queries extras na view/serializer? Usei `select_related`/`prefetch_related`?
+## 🔒 3. SEGURANÇA EM PRODUÇÃO & ZERO-TRUST (ANTI-EXPLOIT)
+
+- **Anti-Mass Assignment:** Nunca use `fields = "__all__"` em serializers de escrita. Declare explicitamente a lista de campos e proteja campos sensíveis com `read_only_fields`.
+- **Anti-IDOR:** Nunca consulte registros usando apenas IDs fornecidos pelo cliente sem escopo de tenant/usuário (use `get_queryset().filter(user=request.user)`).
+- **SSRF Defense:** Valide esquemas de URLs e bloqueie requisições HTTP para faixas de IPs locais/privados (`127.0.0.1`, `10.0.0.0/8`, `169.254.169.254`).
+- **Timing-Attack Resistance:** Use `django.utils.crypto.constant_time_compare()` para validação de tokens, chaves e assinaturas.
+- **SQL & Order Injection Guard:** Nunca use f-strings ou `.format()` em `RawSQL`, `.raw()` ou `.order_by()` dinâmicos. Use `params=[...]` parametrizados.
+- **Deserialização Segura:** Proíba `pickle.loads()`/`load()` em dados não confiáveis; use `json` ou `django.core.signing`.
+
+---
+
+## 🔍 4. CHECKLIST ANTES DE ENTREGAR QUALQUER CÓDIGO
+1. **Queries & Security:** Estou gerando queries extras na view/serializer? Há risco de Mass Assignment ou IDOR?
 2. **Validations:** Estou validando dados crus manualmente ou usando serializadores adequados?
 3. **Complexity:** Minha lógica de ramificações (`if/else/loops`) está muito aninhada? Posso delegar para um método privado ou classe de serviço (`services.py`)?
 4. **Tests:** Os testes estão verdes e cobrindo os caminhos felizes e tristes?

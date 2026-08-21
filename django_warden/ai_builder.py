@@ -14,7 +14,7 @@ def get_template_content(template_name: str) -> str:
         return f.read()
 
 
-KNOWN_AI_DIRECTORIES = [".gemini", ".claude", ".cursor", ".agents", ".continue", ".zed"]
+KNOWN_AI_DIRECTORIES = [".gemini", ".claude", ".cursor", ".agents", ".zed"]
 DEFAULT_AI_DIRECTORIES = [".gemini", ".claude"]
 
 

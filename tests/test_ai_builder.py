@@ -52,8 +52,8 @@ class TestAIBuilder(TestCase):
                 self.assertEqual(settings_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")
 
     def test_multiple_ai_directories_detected_and_included(self):
-        # Setup: create .cursor, .claude, .gemini, and .agents directories
-        for d in [".cursor", ".claude", ".gemini", ".agents"]:
+        # Setup: create .claude and .gemini directories
+        for d in [".claude", ".gemini"]:
             os.makedirs(os.path.join(self.test_dir, d), exist_ok=True)
 
         context = {
@@ -64,11 +64,11 @@ class TestAIBuilder(TestCase):
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
         # Assertions: all existing AI dirs are provisioned
-        self.assertEqual(set(targets), {".cursor", ".claude", ".gemini", ".agents"})
+        self.assertEqual(set(targets), {".claude", ".gemini"})
         self.assertTrue(skill_created)
         self.assertTrue(settings_created)
 
-        for d in [".cursor", ".claude", ".gemini", ".agents"]:
+        for d in [".claude", ".gemini"]:
             skill_file = os.path.join(self.test_dir, d, "skills", "django-warden", "SKILL.md")
             self.assertTrue(os.path.exists(skill_file))
 

@@ -34,7 +34,7 @@ def check_django_ai_boost_installed(app_configs, **kwargs):
                 "The package 'django-ai-boost' is not installed in the environment.",
                 hint=(
                     "The 'django-ai-boost' is an essential MCP (Model Context Protocol) server "
-                    "allowing AI assistants (such as Gemini CLI, Claude, Cursor) to read, "
+                    "allowing AI assistants (such as Gemini CLI, Claude) to read, "
                     "understand, and interact with your Django codebase intelligently and safely.\n\n"
                     "Benefits of having django-ai-boost in the system:\n"
                     "  - 🚀 High-level visibility: Allows the AI to inspect models, URLs, and settings.\n"

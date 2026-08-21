@@ -51,23 +51,41 @@ class TestAIBuilder(TestCase):
                 self.assertIn("codebase-memory-mcp", settings_data["mcpServers"])
                 self.assertEqual(settings_data["mcpServers"]["codebase-memory-mcp"]["command"], "codebase-memory-mcp")
 
-    def test_agents_directory_detected_and_included(self):
-        # Setup: create .agents directory
-        os.makedirs(os.path.join(self.test_dir, ".agents"), exist_ok=True)
+    def test_multiple_ai_directories_detected_and_included(self):
+        # Setup: create .cursor, .claude, .gemini, .continue, and .agents directories
+        for d in [".cursor", ".claude", ".gemini", ".continue", ".agents"]:
+            os.makedirs(os.path.join(self.test_dir, d), exist_ok=True)
 
         context = {
-            "project_name": "agents_project",
-            "settings_module": "agents_project.settings",
+            "project_name": "multi_ai_project",
+            "settings_module": "multi_ai_project.settings",
         }
 
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
-        # Assertions
-        self.assertEqual(set(targets), {".gemini", ".claude", ".agents"})
+        # Assertions: all existing AI dirs are provisioned
+        self.assertEqual(set(targets), {".cursor", ".claude", ".gemini", ".continue", ".agents"})
         self.assertTrue(skill_created)
         self.assertTrue(settings_created)
 
-        skill_file = os.path.join(self.test_dir, ".agents", "skills", "django-warden", "SKILL.md")
+        for d in [".cursor", ".claude", ".gemini", ".continue", ".agents"]:
+            skill_file = os.path.join(self.test_dir, d, "skills", "django-warden", "SKILL.md")
+            self.assertTrue(os.path.exists(skill_file))
+
+    def test_custom_hidden_directory_with_skills_folder_detected(self):
+        # Setup: create .custom_assistant with a skills folder
+        custom_dir = os.path.join(self.test_dir, ".custom_assistant", "skills")
+        os.makedirs(custom_dir, exist_ok=True)
+
+        context = {
+            "project_name": "custom_assistant_project",
+            "settings_module": "custom_assistant_project.settings",
+        }
+
+        targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
+
+        self.assertIn(".custom_assistant", targets)
+        skill_file = os.path.join(self.test_dir, ".custom_assistant", "skills", "django-warden", "SKILL.md")
         self.assertTrue(os.path.exists(skill_file))
 
     def test_smart_merge_preserves_existing_settings(self):
@@ -92,7 +110,7 @@ class TestAIBuilder(TestCase):
         targets, skill_created, settings_created = ensure_ai_structure(self.test_dir, context)
 
         # Assertions
-        self.assertEqual(set(targets), {".gemini", ".claude"})
+        self.assertEqual(set(targets), {".gemini"})
         self.assertTrue(skill_created)
 
         with open(settings_file_path, "r", encoding="utf-8") as f:

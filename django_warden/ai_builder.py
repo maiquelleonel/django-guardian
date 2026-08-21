@@ -14,22 +14,42 @@ def get_template_content(template_name: str) -> str:
         return f.read()
 
 
-SUPPORTED_AI_DIRECTORIES = [".gemini", ".claude"]
+KNOWN_AI_DIRECTORIES = [".gemini", ".claude", ".cursor", ".agents", ".continue", ".zed"]
+DEFAULT_AI_DIRECTORIES = [".gemini", ".claude"]
 
 
-def _get_target_directories(base_dir: str) -> list[str]:
+def _get_target_directories(base_dir: str, create_defaults_if_empty: bool = True) -> list[str]:
     """
     Determines all active target directories for AI instructions and MCP settings.
-    Ensures primary supported assistants (.gemini, .claude) are always targeted,
-    plus any additional detected agent directories.
+    Scans base_dir for any known AI assistant directory or any hidden directory
+    containing a 'skills' subfolder or 'settings.json' file.
     """
-    targets = list(SUPPORTED_AI_DIRECTORIES)
+    base_dir = str(base_dir)
+    detected = set()
 
-    agents_path = os.path.join(base_dir, ".agents")
-    if os.path.isdir(agents_path) and ".agents" not in targets:
-        targets.append(".agents")
+    # 1. Check for presence of known AI assistant directories
+    for directory_name in KNOWN_AI_DIRECTORIES:
+        if os.path.isdir(os.path.join(base_dir, directory_name)):
+            detected.add(directory_name)
 
-    return targets
+    # 2. Dynamically discover any other hidden directory with a 'skills' folder or 'settings.json'
+    try:
+        if os.path.exists(base_dir):
+            for entry in os.listdir(base_dir):
+                entry_path = os.path.join(base_dir, entry)
+                if os.path.isdir(entry_path) and entry.startswith("."):
+                    skills_path = os.path.join(entry_path, "skills")
+                    settings_file = os.path.join(entry_path, "settings.json")
+                    if os.path.isdir(skills_path) or os.path.exists(settings_file):
+                        detected.add(entry)
+    except OSError:
+        pass
+
+    # If no AI folder was found, optionally provision the default primary assistants
+    if not detected and create_defaults_if_empty:
+        detected.update(DEFAULT_AI_DIRECTORIES)
+
+    return sorted(detected)
 
 
 def _write_skill_file(target_path: str, rendered_skill: str) -> bool:

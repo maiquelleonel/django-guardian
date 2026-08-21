@@ -23,6 +23,7 @@ class DjangoWardenConfig(AppConfig):
 
                     base_dir = getattr(settings, "BASE_DIR", None)
                     if base_dir:
+                        base_dir = str(base_dir)
                         # Determine project name and settings module dynamically
                         wsgi_app = getattr(settings, "WSGI_APPLICATION", None)
                         project_name = wsgi_app.split(".")[0] if wsgi_app else os.path.basename(base_dir)

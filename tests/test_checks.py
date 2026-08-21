@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 
 from django.core.checks import run_checks
@@ -99,6 +100,46 @@ class TestAIBoostChecks(TestCase):
         self.assertEqual(len(infos), 1)
         self.assertIn("The package 'django-ai-boost' is installed", infos[0].msg)
         self.assertIsNone(infos[0].hint)
+
+    def test_check_ai_bootstrap_integrity_in_development(self):
+        import shutil
+        import tempfile
+
+        from django.test import override_settings
+
+        temp_dir = tempfile.mkdtemp()
+        try:
+            # Create a detected directory like .claude
+            os.makedirs(os.path.join(temp_dir, ".claude"), exist_ok=True)
+            with override_settings(BASE_DIR=temp_dir, DEBUG=True):
+                # When run in debug mode, it should auto-provision the structure
+                errors = run_checks()
+                warnings = [e for e in errors if e.id == "warden.W016"]
+                self.assertEqual(len(warnings), 0)
+
+                # Check files were created in detected dir
+                skill_file = os.path.join(temp_dir, ".claude", "skills", "django-warden", "SKILL.md")
+                self.assertTrue(os.path.exists(skill_file))
+        finally:
+            shutil.rmtree(temp_dir)
+
+    def test_check_ai_bootstrap_integrity_warns_when_missing_in_production(self):
+        import shutil
+        import tempfile
+
+        from django.test import override_settings
+
+        temp_dir = tempfile.mkdtemp()
+        try:
+            # Create a detected directory like .cursor with empty skills folder
+            os.makedirs(os.path.join(temp_dir, ".cursor", "skills"), exist_ok=True)
+            with override_settings(BASE_DIR=temp_dir, DEBUG=False):
+                errors = run_checks()
+                warnings = [e for e in errors if e.id == "warden.W016"]
+                self.assertEqual(len(warnings), 1)
+                self.assertIn(".cursor", warnings[0].msg)
+        finally:
+            shutil.rmtree(temp_dir)
 
 
 class TestCodebaseMemoryChecks(TestCase):

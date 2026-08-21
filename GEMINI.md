@@ -1,47 +1,46 @@
 # 🧬 GEMINI HARNESS & AI BOOTSTRAP DIRECTIVES
 
-Este arquivo dita as regras de inicialização e as diretivas de boot para qualquer Inteligência Artificial ou Agente Automatizado que operar neste repositório. Suas instruções possuem **precedência absoluta** sobre qualquer fluxo de trabalho geral.
+This file dictates initialization rules and boot directives for any Artificial Intelligence or Automated Agent operating in this repository. Its instructions have **absolute precedence** over any general workflow.
 
 ---
 
-## 🚨 1. REGRA DE OURO DE INICIALIZAÇÃO (First-Turn Command Rule)
+## 🚨 1. FIRST-TURN INITIALIZATION RULE (First-Turn Command Rule)
 
-- **Ação Número Um (OBRIGATÓRIA):** Ao iniciar esta sessão, na sua **PRIMEIRA rodada de conversa (First Turn)**, você DEVE executar imediatamente o comando de ferramenta `read_file` para carregar e analisar a especificação da skill em `SKILL.md`.
-- **Sem Ações Prematuras:** Você está expressamente PROIBIDO de propor estratégias, gerar códigos, responder perguntas ou aplicar qualquer modificação sem antes ter lido o `SKILL.md` por completo.
-- **🛡️ Validação de Skill Obrigatória (Django Guardian):**
-  - Você deve verificar se a skill está instalada e ativa nesta sessão (ela deve ser ativada por demanda via `activate_skill` caso esteja instalada).
-  - **🔌 Validação Obrigatória de Servidores MCP:**
-    - Você DEVE validar se as ferramentas do MCP `django-ai-boost` (ex: `list_apps`, `get_model_schema`) estão carregadas e prontas no ambiente de execução do assistente.
-
----
-
-## 🛡️ 2. CONTRATO DE QUALIDADE E CONFORMIDADE DE CÓDIGO (SLA Compliance)
-
-Ao operar neste repositório, alinhe todos os seus comportamentos de escrita de código e refatorações aos seguintes parâmetros de excelência estabelecidos:
-
-- **100% Code Coverage SLA:** Toda e qualquer linha lógica adicionada ou alterada na aplicação deve conter testes unitários correspondentes para manter a alta cobertura de código do projeto.
-- **Complexidade de McCabe < 10:** Nenhuma função de negócio convencional pode ultrapassar a complexidade ciclomática de 10.
-- **Delegação de Eventos/Handlers:** Webhooks e dispatchers densos devem ser obrigatoriamente refatorados usando o padrão de Delegação de Handlers privados, mantendo a complexidade do router principal de eventos extremamente baixa (< 4).
-- **Sem Hardcoded de Prompts:** Prompts de sistema de IA devem viver isolados em arquivos `.prompt` ou markdown dedicados e nunca embutidos diretamente em arquivos Python.
-- **No-Storytelling Rule (Comentários Limpos):** É estritamente proibido adicionar comentários prolixos ou em tom de narrativa sobre especificações ou decisões de negócios. Comentários em bloco (`#`) não podem ultrapassar **3 linhas**, linhas individuais de comentário não podem ultrapassar **120 caracteres**, e jargões explicativos redundantes ou obsoletos são ativamente rejeitados pelo Harness.
-- **Idempotência de Índices em Migrações:** Qualquer operação envolvendo a criação de índices no banco de dados deve obrigatoriamente incluir a cláusula/checagem de existência (ex: `IF NOT EXISTS`), prevenindo quebras acidentais na execução sequencial de migrations em ambientes de desenvolvimento e produção.
+- **Action Number One (MANDATORY):** Upon starting this session, on your **FIRST conversational turn (First Turn)**, you MUST immediately execute the `read_file` tool to load and analyze the skill specification in `SKILL.md`.
+- **No Premature Actions:** You are strictly PROHIBITED from proposing strategies, generating code, answering questions, or applying any modifications without having read `SKILL.md` completely.
+- **🛡️ Mandatory Skill Validation (Django Guardian):**
+  - You must verify if the skill is installed and active in this session (it must be activated on demand via `activate_skill` if installed).
+  - **🔌 Mandatory MCP Server Validation:**
+    - You MUST validate that tools from the `django-ai-boost` MCP (e.g., `list_apps`, `get_model_schema`) are loaded and ready in the assistant's execution environment.
 
 ---
 
-## ⚡ 3. INTEGRAÇÃO COM DJANGO-AI-BOOST (MCP Server)
+## 🛡️ 2. QUALITY AND CODE COMPLIANCE CONTRACT (SLA Compliance)
 
-Este projeto utiliza o `django-ai-boost` como servidor MCP para otimizar o contexto e a capacidade de análise das ferramentas de IA.
+When operating in this repository, align all code-writing and refactoring behaviors to the following established excellence standards:
 
-- **Configuração de Contexto Dinâmica:** O agente deve se autoajustar e atualizar as configurações locais do MCP Server do editor correspondente de forma automatizada (por exemplo, no arquivo de configuração do MCP), garantindo que o módulo de settings apontado seja sempre o módulo correto do projeto Django.
-- **Validação de Código Ativa:** O assistente deve utilizar ativamente a ferramenta `run_check` fornecida pelo `django-ai-boost` para validar em tempo real se alguma regra arquitetural do `SKILL.md` foi violada.
+- **100% Code Coverage SLA:** Any and all logical lines added or modified in the application must include corresponding unit tests to maintain high project test coverage.
+- **McCabe Complexity < 10:** No standard business function may exceed a cyclomatic complexity of 10.
+- **Event/Handler Delegation:** Heavy webhooks and dispatchers must be refactored using the Private Handler Delegation pattern, keeping the main event router's complexity extremely low (< 4).
+- **No Hardcoded Prompts:** AI system prompts must live isolated in dedicated `.prompt` or markdown files and never embedded directly into Python files.
+- **No-Storytelling Rule (Clean Comments):** Adding verbose or narrative comments about specifications or business decisions is strictly forbidden. Block comments (`#`) must not exceed **3 lines**, individual comment lines must not exceed **120 characters**, and redundant or obsolete explanatory jargon is actively rejected by the Harness.
+- **Idempotent Indexing in Migrations:** Any operation involving database index creation must explicitly include the existence check/clause (e.g., `IF NOT EXISTS`), preventing accidental failures during sequential migration execution in development and production environments.
 
 ---
 
-## 🛠️ 5. COMANDOS DO PROJETO (Justfile Automation)
+## ⚡ 3. INTEGRATION WITH DJANGO-AI-BOOST (MCP Server)
 
-O repositório utiliza o `Justfile` para automação do ciclo de desenvolvimento e verificação de conformidade:
+This project uses `django-ai-boost` as an MCP server to optimize the AI tools' context and introspection capabilities.
 
-- `just test`: Executa a suíte de testes com `uv run tests/manage.py test tests -v 0`.
-- `just lint`: Executa a verificação estática de lint com `uv run ruff check .`.
-- `just fmt`: Aplica a formatação automática de código com `uv run ruff format .`.
+- **Dynamic Context Configuration:** The agent must automatically self-adjust and update local MCP Server configurations for the corresponding editor (e.g., inside the MCP configuration file), ensuring the designated settings module always points to the correct Django project module.
+- **Active Code Validation:** The assistant must actively use the `run_check` tool provided by `django-ai-boost` to validate in real time whether any architectural rule from `SKILL.md` has been violated.
 
+---
+
+## 🛠️ 4. PROJECT COMMANDS (Justfile Automation)
+
+The repository uses `Justfile` for development cycle automation and compliance verification:
+
+- `just test`: Runs the test suite with `uv run tests/manage.py test tests -v 0`.
+- `just lint`: Runs static lint checks with `uv run ruff check .`.
+- `just fmt`: Formats code automatically with `uv run ruff format .`.

@@ -36,8 +36,8 @@ class TestAIBuilder(TestCase):
 
             with open(skill_file, "r", encoding="utf-8") as f:
                 content = f.read()
-                self.assertIn("DJANGO GUARDIAN SKILL: MY_TEST_APP", content)
-                self.assertIn("my_test_app", content)
+                self.assertIn("Django Warden & Expert Skill", content)
+                self.assertIn("django-warden", content)
 
             settings_file = os.path.join(self.test_dir, target_dir, "settings.json")
             self.assertTrue(os.path.exists(settings_file))

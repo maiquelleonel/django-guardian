@@ -6,9 +6,16 @@ from django.template import Context, Engine
 
 def get_template_content(template_name: str) -> str:
     """
-    Reads the content of a template file from the packaged templates.
+    Reads the content of a template file from the packaged templates,
+    or directly from repository root if running in local source tree.
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    if template_name == "SKILL.md.tpl":
+        root_skill = os.path.join(current_dir, "..", "SKILL.md")
+        if os.path.isfile(root_skill):
+            with open(root_skill, "r", encoding="utf-8") as f:
+                return f.read()
+
     template_path = os.path.join(current_dir, "templates", "warden_ai", template_name)
     with open(template_path, "r", encoding="utf-8") as f:
         return f.read()
